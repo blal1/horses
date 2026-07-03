@@ -1,0 +1,80 @@
+[
+  {
+    "race_id": "rookie_cup_opening",
+    "name": "Rookie Cup Opening",
+    "track_id": "ashford_oval",
+    "weather_id": "clear",
+    "briefing": "Opening day at Ashford Oval. Copper Gate attacks early from Oak Lane while the player stable settles into the season.",
+    "rival_stables": {
+      "copper_gate": "oak_lane",
+      "river_chime": "heatherbank",
+      "storm_marrow": "heatherbank",
+      "golden_switch": "stormforge"
+    }
+  },
+  {
+    "race_id": "bracken_pressure",
+    "name": "Bracken Pressure",
+    "track_id": "bracken_dirt",
+    "weather_id": "windy",
+    "briefing": "Golden Switch brings Stormforge sprint pressure to Bracken Dirt. A rested stable can absorb the early pace.",
+    "rival_stables": {
+      "copper_gate": "oak_lane",
+      "river_chime": "heatherbank",
+      "storm_marrow": "ironwood",
+      "golden_switch": "stormforge"
+    }
+  },
+  {
+    "race_id": "meadowbrook_trial",
+    "name": "Meadowbrook Trial",
+    "track_id": "meadowbrook_mile",
+    "weather_id": "clear",
+    "briefing": "River Chime gets Heatherbank support on soft turf. Training before this race rewards handling and stamina.",
+    "rival_stables": {
+      "copper_gate": "oak_lane",
+      "river_chime": "heatherbank",
+      "storm_marrow": "ironwood",
+      "golden_switch": "stormforge"
+    }
+  },
+  {
+    "race_id": "ironwood_switchback",
+    "name": "Ironwood Switchback",
+    "track_id": "meadowbrook_mile",
+    "weather_id": "rain",
+    "briefing": "Ironwood hosts a wet technical round. Storm Marrow becomes the late rival to watch through the final bend.",
+    "rival_stables": {
+      "copper_gate": "stormforge",
+      "river_chime": "heatherbank",
+      "storm_marrow": "ironwood",
+      "golden_switch": "stormforge"
+    }
+  },
+  {
+    "race_id": "bracken_showdown",
+    "name": "Bracken Showdown",
+    "track_id": "bracken_dirt",
+    "weather_id": "clear",
+    "briefing": "The dirt rematch decides the sprint rivalry. Rest protects energy; career training can create a late-season edge.",
+    "rival_stables": {
+      "copper_gate": "stormforge",
+      "river_chime": "ironwood",
+      "storm_marrow": "ironwood",
+      "golden_switch": "stormforge"
+    }
+  },
+  {
+    "race_id": "ashford_final",
+    "name": "Ashford Final",
+    "track_id": "ashford_oval",
+    "weather_id": "rain",
+    "briefing": "Final round in rain at Ashford. Stable identity, rewards, rival points, and energy all converge for the title.",
+    "rival_stables": {
+      "copper_gate": "stormforge",
+      "river_chime": "heatherbank",
+      "storm_marrow": "ironwood",
+      "golden_switch": "stormforge"
+    }
+  }
+]

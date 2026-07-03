@@ -1,0 +1,52 @@
+[
+  {
+    "track_id": "ashford_oval",
+    "obstacles": [
+      {"obstacle_id": "ashford_cone_1", "distance_m": 180.0, "lane": 0, "kind": "cone", "label": "Fallen marker", "required_action": "dodge"},
+      {"obstacle_id": "ashford_puddle_1", "distance_m": 310.0, "lane": 2, "kind": "puddle", "label": "Wet patch", "required_action": "jump"},
+      {"obstacle_id": "ashford_rail_1", "distance_m": 470.0, "lane": 1, "kind": "rail", "label": "Loose rail", "required_action": "jump"},
+      {"obstacle_id": "ashford_low_branch_1", "distance_m": 560.0, "lane": 2, "kind": "low_branch", "label": "Low branch", "required_action": "duck"},
+      {"obstacle_id": "ashford_cone_2", "distance_m": 620.0, "lane": 3, "kind": "cone", "label": "Track marker", "required_action": "dodge"},
+      {"obstacle_id": "ashford_mud_1", "distance_m": 790.0, "lane": 0, "kind": "mud", "label": "Soft ground", "required_action": "dodge"},
+      {"obstacle_id": "ashford_puddle_2", "distance_m": 960.0, "lane": 4, "kind": "puddle", "label": "Standing water", "required_action": "jump"},
+      {"obstacle_id": "ashford_rail_2", "distance_m": 1130.0, "lane": 2, "kind": "rail", "label": "Broken rail", "required_action": "jump"},
+      {"obstacle_id": "ashford_banner_1", "distance_m": 1230.0, "lane": 0, "kind": "low_banner", "label": "Low banner", "required_action": "duck"},
+      {"obstacle_id": "ashford_cone_3", "distance_m": 1320.0, "lane": 1, "kind": "cone", "label": "Fallen marker", "required_action": "dodge"},
+      {"obstacle_id": "ashford_mud_2", "distance_m": 1460.0, "lane": 3, "kind": "mud", "label": "Heavy turf", "required_action": "dodge"}
+    ]
+  },
+  {
+    "track_id": "bracken_dirt",
+    "obstacles": [
+      {"obstacle_id": "bracken_rock_1", "distance_m": 150.0, "lane": 1, "kind": "stone", "label": "Loose stone", "required_action": "dodge"},
+      {"obstacle_id": "bracken_mud_1", "distance_m": 260.0, "lane": 3, "kind": "mud", "label": "Deep dirt", "required_action": "dodge"},
+      {"obstacle_id": "bracken_barrel_1", "distance_m": 380.0, "lane": 0, "kind": "barrel", "label": "Barrel", "required_action": "jump"},
+      {"obstacle_id": "bracken_low_gate_1", "distance_m": 450.0, "lane": 2, "kind": "low_gate", "label": "Low gate", "required_action": "duck"},
+      {"obstacle_id": "bracken_rock_2", "distance_m": 520.0, "lane": 2, "kind": "stone", "label": "Loose stone", "required_action": "dodge"},
+      {"obstacle_id": "bracken_mud_2", "distance_m": 720.0, "lane": 4, "kind": "mud", "label": "Deep dirt", "required_action": "dodge"},
+      {"obstacle_id": "bracken_barrel_2", "distance_m": 910.0, "lane": 1, "kind": "barrel", "label": "Barrel", "required_action": "jump"},
+      {"obstacle_id": "bracken_rope_1", "distance_m": 980.0, "lane": 0, "kind": "low_rope", "label": "Low rope", "required_action": "duck"},
+      {"obstacle_id": "bracken_rock_3", "distance_m": 1060.0, "lane": 3, "kind": "stone", "label": "Loose stone", "required_action": "dodge"}
+    ]
+  },
+  {
+    "track_id": "audio_obstacle_lab",
+    "obstacles": [
+      {"obstacle_id": "lab_dodge_left", "distance_m": 120.0, "lane": 1, "kind": "cone", "label": "Dodge marker left", "required_action": "dodge"},
+      {"obstacle_id": "lab_jump_center", "distance_m": 210.0, "lane": 2, "kind": "rail", "label": "Jump rail center", "required_action": "jump"},
+      {"obstacle_id": "lab_duck_right", "distance_m": 300.0, "lane": 3, "kind": "low_branch", "label": "Duck branch right", "required_action": "duck"}
+    ]
+  },
+  {
+    "track_id": "meadowbrook_mile",
+    "obstacles": [
+      {"obstacle_id": "meadow_puddle_1", "distance_m": 220.0, "lane": 2, "kind": "puddle", "label": "Wet patch", "required_action": "jump"},
+      {"obstacle_id": "meadow_cone_1", "distance_m": 400.0, "lane": 4, "kind": "cone", "label": "Fallen marker", "required_action": "dodge"},
+      {"obstacle_id": "meadow_branch_1", "distance_m": 560.0, "lane": 1, "kind": "low_branch", "label": "Low branch", "required_action": "duck"},
+      {"obstacle_id": "meadow_mud_1", "distance_m": 760.0, "lane": 3, "kind": "mud", "label": "Soft ground", "required_action": "dodge"},
+      {"obstacle_id": "meadow_rail_1", "distance_m": 980.0, "lane": 2, "kind": "rail", "label": "Loose rail", "required_action": "jump"},
+      {"obstacle_id": "meadow_banner_1", "distance_m": 1180.0, "lane": 0, "kind": "low_banner", "label": "Low banner", "required_action": "duck"},
+      {"obstacle_id": "meadow_cone_2", "distance_m": 1330.0, "lane": 5, "kind": "cone", "label": "Track marker", "required_action": "dodge"}
+    ]
+  }
+]

@@ -1,0 +1,194 @@
+[
+  {
+    "horse_id": "ember_stride",
+    "name": "Ember Stride",
+    "role": "player",
+    "preferred_surface": "turf",
+    "signature_sound": "mixkit_horse_85",
+    "stats": {
+      "max_speed_mps": 17.2,
+      "acceleration": 7.8,
+      "stamina_capacity": 82.0,
+      "stamina_recovery": 4.5,
+      "handling": 8.0,
+      "nervousness": 3.5
+    },
+    "traits": ["fast_finisher", "calm_in_crowd"]
+  },
+  {
+    "horse_id": "night_rail",
+    "name": "Night Rail",
+    "role": "player",
+    "preferred_surface": "dirt",
+    "signature_sound": "mixkit_horse_83",
+    "stats": {
+      "max_speed_mps": 16.8,
+      "acceleration": 8.4,
+      "stamina_capacity": 76.0,
+      "stamina_recovery": 4.0,
+      "handling": 8.7,
+      "nervousness": 5.0
+    },
+    "traits": ["inside_runner", "quick_start"]
+  },
+  {
+    "horse_id": "silver_heather",
+    "name": "Silver Heather",
+    "role": "player",
+    "preferred_surface": "soft_turf",
+    "signature_sound": "mixkit_horse_76",
+    "stats": {
+      "max_speed_mps": 16.4,
+      "acceleration": 7.0,
+      "stamina_capacity": 90.0,
+      "stamina_recovery": 5.2,
+      "handling": 7.4,
+      "nervousness": 2.8
+    },
+    "traits": ["endurance", "rain_comfort"]
+  },
+  {
+    "horse_id": "copper_gate",
+    "name": "Copper Gate",
+    "role": "opponent",
+    "preferred_surface": "turf",
+    "signature_sound": "mixkit_horse_7",
+    "stats": {
+      "max_speed_mps": 17.0,
+      "acceleration": 8.1,
+      "stamina_capacity": 78.0,
+      "stamina_recovery": 4.2,
+      "handling": 7.8,
+      "nervousness": 4.2
+    },
+    "traits": ["front_runner"]
+  },
+  {
+    "horse_id": "river_chime",
+    "name": "River Chime",
+    "role": "opponent",
+    "preferred_surface": "turf",
+    "signature_sound": "mixkit_horse_80",
+    "stats": {
+      "max_speed_mps": 16.6,
+      "acceleration": 7.4,
+      "stamina_capacity": 84.0,
+      "stamina_recovery": 4.8,
+      "handling": 8.3,
+      "nervousness": 3.2
+    },
+    "traits": ["late_surge"]
+  },
+  {
+    "horse_id": "storm_marrow",
+    "name": "Storm Marrow",
+    "role": "opponent",
+    "preferred_surface": "mud",
+    "signature_sound": "mixkit_horse_77",
+    "stats": {
+      "max_speed_mps": 16.2,
+      "acceleration": 7.9,
+      "stamina_capacity": 86.0,
+      "stamina_recovery": 4.6,
+      "handling": 7.1,
+      "nervousness": 6.0
+    },
+    "traits": ["mud_specialist"]
+  },
+  {
+    "horse_id": "golden_switch",
+    "name": "Golden Switch",
+    "role": "opponent",
+    "preferred_surface": "dirt",
+    "signature_sound": "mixkit_horse_1762",
+    "stats": {
+      "max_speed_mps": 17.4,
+      "acceleration": 7.6,
+      "stamina_capacity": 72.0,
+      "stamina_recovery": 3.8,
+      "handling": 7.9,
+      "nervousness": 4.9
+    },
+    "traits": ["sprinter"]
+  },
+  {
+    "horse_id": "meadow_signal",
+    "name": "Meadow Signal",
+    "role": "opponent",
+    "preferred_surface": "soft_turf",
+    "signature_sound": "mixkit_horse_30",
+    "stats": {
+      "max_speed_mps": 16.1,
+      "acceleration": 6.9,
+      "stamina_capacity": 92.0,
+      "stamina_recovery": 5.4,
+      "handling": 7.6,
+      "nervousness": 2.5
+    },
+    "traits": ["patient_runner"]
+  },
+  {
+    "horse_id": "dawn_spark",
+    "name": "Dawn Spark",
+    "role": "player",
+    "preferred_surface": "turf",
+    "signature_sound": "mixkit_horse_85",
+    "stats": {
+      "max_speed_mps": 17.0,
+      "acceleration": 8.2,
+      "stamina_capacity": 80.0,
+      "stamina_recovery": 4.6,
+      "handling": 8.2,
+      "nervousness": 3.2
+    },
+    "traits": ["quick_start", "fast_finisher"]
+  },
+  {
+    "horse_id": "iron_vale",
+    "name": "Iron Vale",
+    "role": "player",
+    "preferred_surface": "dirt",
+    "signature_sound": "mixkit_horse_83",
+    "stats": {
+      "max_speed_mps": 16.6,
+      "acceleration": 7.6,
+      "stamina_capacity": 88.0,
+      "stamina_recovery": 5.0,
+      "handling": 8.5,
+      "nervousness": 3.0
+    },
+    "traits": ["endurance", "inside_runner"]
+  },
+  {
+    "horse_id": "brass_comet",
+    "name": "Brass Comet",
+    "role": "opponent",
+    "preferred_surface": "dirt",
+    "signature_sound": "mixkit_horse_7",
+    "stats": {
+      "max_speed_mps": 17.5,
+      "acceleration": 8.0,
+      "stamina_capacity": 70.0,
+      "stamina_recovery": 3.6,
+      "handling": 7.7,
+      "nervousness": 5.2
+    },
+    "traits": ["sprinter"]
+  },
+  {
+    "horse_id": "willow_drift",
+    "name": "Willow Drift",
+    "role": "opponent",
+    "preferred_surface": "soft_turf",
+    "signature_sound": "mixkit_horse_30",
+    "stats": {
+      "max_speed_mps": 16.3,
+      "acceleration": 7.1,
+      "stamina_capacity": 90.0,
+      "stamina_recovery": 5.3,
+      "handling": 7.7,
+      "nervousness": 2.7
+    },
+    "traits": ["late_surge", "rain_comfort"]
+  }
+]

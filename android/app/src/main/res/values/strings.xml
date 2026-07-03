@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Horse Racing Audio First</string>
+    <string name="android_shell_status">Horse Racing Audio First Android shell. Touch race surface integration pending.</string>
+    <string name="race_surface_description">Audio-first race surface. Drag to steer and pace, swipe up to jump, swipe down to duck, double tap to push, long press or two-finger tap for status.</string>
+    <string name="race_surface_ready">Race surface ready</string>
+    <string name="race_surface_tap_confirmed">Touch received</string>
+    <string name="race_action_accelerate">Accelerate</string>
+    <string name="race_action_slow">Slow down</string>
+    <string name="race_action_left">Steer left</string>
+    <string name="race_action_right">Steer right</string>
+    <string name="race_action_push">Push</string>
+    <string name="race_action_jump">Jump</string>
+    <string name="race_action_duck">Duck</string>
+    <string name="race_action_status">Status requested</string>
+    <string name="race_action_hold">Hold pace</string>
+</resources>

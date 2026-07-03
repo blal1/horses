@@ -1,0 +1,6 @@
+Act as a Context Compression Script. Scan my entire repository layout and existing code files. Do NOT write any code or make modifications. Instead, initialize and generate a single markdown file named project-state.md at the root.
+This file must strictly contain:
+1. An itemized tree of the current File Architecture.
+2. A concise architectural overview of how modules connect (Data Flow Map).
+3. Compressed functional summaries of each file, tracking exported functions/classes and their structural intent.
+Once this file is written, we will use it as the definitive context baseline for all future prompts to save token overhead.

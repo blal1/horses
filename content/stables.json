@@ -1,0 +1,42 @@
+[
+  {
+    "stable_id": "oak_lane",
+    "name": "Oak Lane Stable",
+    "focus": "balanced",
+    "description": "A calm, balanced yard for learning race craft without sharp tradeoffs.",
+    "speed_modifier": 1.0,
+    "stamina_modifier": 1.0,
+    "handling_modifier": 1.0,
+    "calm_modifier": 1.0
+  },
+  {
+    "stable_id": "stormforge",
+    "name": "Stormforge Yard",
+    "focus": "speed",
+    "description": "A hard-driving sprint yard that adds top speed but demands steadier hands.",
+    "speed_modifier": 1.025,
+    "stamina_modifier": 0.985,
+    "handling_modifier": 0.99,
+    "calm_modifier": 1.04
+  },
+  {
+    "stable_id": "heatherbank",
+    "name": "Heatherbank Endurance",
+    "focus": "stamina",
+    "description": "A patient distance-focused stable that protects stamina and keeps horses settled.",
+    "speed_modifier": 0.99,
+    "stamina_modifier": 1.04,
+    "handling_modifier": 1.01,
+    "calm_modifier": 0.94
+  },
+  {
+    "stable_id": "ironwood",
+    "name": "Ironwood Control",
+    "focus": "handling",
+    "description": "A technical yard that sharpens steering and composure for tight, twisting tracks.",
+    "speed_modifier": 0.995,
+    "stamina_modifier": 1.0,
+    "handling_modifier": 1.03,
+    "calm_modifier": 0.97
+  }
+]

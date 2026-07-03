@@ -1,0 +1,190 @@
+[
+  {
+    "track_id": "ashford_oval",
+    "name": "Ashford Oval",
+    "length_m": 1500.0,
+    "surface": "turf",
+    "lanes": 8,
+    "handedness": "left",
+    "final_stretch_start_m": 1120.0,
+    "audio_profile": {
+      "crowd_loop": "mixkit_crowd_424",
+      "wind_loop": "mixkit_wind_2608",
+      "rain_loop": "mixkit_rain_2393",
+      "countdown": "mixkit_countdown_916"
+    },
+    "segments": [
+      {
+        "start_m": 0.0,
+        "end_m": 350.0,
+        "curve_direction": "none",
+        "curve_intensity": 0.0,
+        "slope": 0.0,
+        "audio_marker": "grandstand_left"
+      },
+      {
+        "start_m": 350.0,
+        "end_m": 750.0,
+        "curve_direction": "left",
+        "curve_intensity": 0.55,
+        "slope": 0.01,
+        "audio_marker": "inner_rail_left"
+      },
+      {
+        "start_m": 750.0,
+        "end_m": 1120.0,
+        "curve_direction": "none",
+        "curve_intensity": 0.0,
+        "slope": -0.005,
+        "audio_marker": "backstretch_wind"
+      },
+      {
+        "start_m": 1120.0,
+        "end_m": 1500.0,
+        "curve_direction": "left",
+        "curve_intensity": 0.35,
+        "slope": 0.0,
+        "audio_marker": "finish_crowd_front"
+      }
+    ]
+  },
+  {
+    "track_id": "bracken_dirt",
+    "name": "Bracken Dirt",
+    "length_m": 1150.0,
+    "surface": "dirt",
+    "lanes": 6,
+    "handedness": "right",
+    "final_stretch_start_m": 820.0,
+    "audio_profile": {
+      "crowd_loop": "mixkit_crowd_478",
+      "wind_loop": "mixkit_wind_788",
+      "rain_loop": "mixkit_rain_2390",
+      "countdown": "mixkit_countdown_1045"
+    },
+    "segments": [
+      {
+        "start_m": 0.0,
+        "end_m": 250.0,
+        "curve_direction": "none",
+        "curve_intensity": 0.0,
+        "slope": 0.0,
+        "audio_marker": "start_gate_rear"
+      },
+      {
+        "start_m": 250.0,
+        "end_m": 650.0,
+        "curve_direction": "right",
+        "curve_intensity": 0.65,
+        "slope": 0.015,
+        "audio_marker": "inner_rail_right"
+      },
+      {
+        "start_m": 650.0,
+        "end_m": 820.0,
+        "curve_direction": "none",
+        "curve_intensity": 0.0,
+        "slope": -0.01,
+        "audio_marker": "loose_dirt"
+      },
+      {
+        "start_m": 820.0,
+        "end_m": 1150.0,
+        "curve_direction": "none",
+        "curve_intensity": 0.0,
+        "slope": 0.0,
+        "audio_marker": "finish_crowd_front"
+      }
+    ]
+  },
+  {
+    "track_id": "audio_obstacle_lab",
+    "name": "Audio Obstacle Lab",
+    "length_m": 420.0,
+    "surface": "turf",
+    "lanes": 5,
+    "handedness": "left",
+    "final_stretch_start_m": 320.0,
+    "audio_profile": {
+      "crowd_loop": "mixkit_crowd_424",
+      "wind_loop": "mixkit_wind_2608",
+      "rain_loop": "mixkit_rain_2393",
+      "countdown": "mixkit_countdown_916"
+    },
+    "segments": [
+      {
+        "start_m": 0.0,
+        "end_m": 180.0,
+        "curve_direction": "none",
+        "curve_intensity": 0.0,
+        "slope": 0.0,
+        "audio_marker": "obstacle_lab_start"
+      },
+      {
+        "start_m": 180.0,
+        "end_m": 320.0,
+        "curve_direction": "left",
+        "curve_intensity": 0.35,
+        "slope": 0.0,
+        "audio_marker": "obstacle_lab_turn"
+      },
+      {
+        "start_m": 320.0,
+        "end_m": 420.0,
+        "curve_direction": "none",
+        "curve_intensity": 0.0,
+        "slope": 0.0,
+        "audio_marker": "obstacle_lab_finish"
+      }
+    ]
+  },
+  {
+    "track_id": "meadowbrook_mile",
+    "name": "Meadowbrook Mile",
+    "length_m": 1400.0,
+    "surface": "soft_turf",
+    "lanes": 8,
+    "handedness": "right",
+    "final_stretch_start_m": 1040.0,
+    "audio_profile": {
+      "crowd_loop": "mixkit_crowd_478",
+      "wind_loop": "mixkit_wind_788",
+      "rain_loop": "mixkit_rain_2390",
+      "countdown": "mixkit_countdown_1045"
+    },
+    "segments": [
+      {
+        "start_m": 0.0,
+        "end_m": 320.0,
+        "curve_direction": "none",
+        "curve_intensity": 0.0,
+        "slope": 0.0,
+        "audio_marker": "meadow_start_gate"
+      },
+      {
+        "start_m": 320.0,
+        "end_m": 700.0,
+        "curve_direction": "right",
+        "curve_intensity": 0.5,
+        "slope": 0.012,
+        "audio_marker": "inner_rail_right"
+      },
+      {
+        "start_m": 700.0,
+        "end_m": 1040.0,
+        "curve_direction": "none",
+        "curve_intensity": 0.0,
+        "slope": -0.008,
+        "audio_marker": "meadow_backstretch"
+      },
+      {
+        "start_m": 1040.0,
+        "end_m": 1400.0,
+        "curve_direction": "right",
+        "curve_intensity": 0.3,
+        "slope": 0.0,
+        "audio_marker": "finish_crowd_front"
+      }
+    ]
+  }
+]

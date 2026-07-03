@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      SDL_VIDEODRIVER: dummy
+      SDL_AUDIODRIVER: dummy
+      PYTHONUTF8: "1"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e . pytest pytest-cov
+
+      - name: Validate JSON content
+        run: python -c "import json, pathlib; [json.loads(pathlib.Path(path).read_text(encoding='utf-8-sig')) for path in ('content/sound_manifest.json', 'content/elevenlabs_audio_prompts.json', 'content/championship.json', 'content/tracks.json', 'content/obstacles.json')]"
+
+      - name: Run tests with coverage
+        run: python -m pytest tests/ --cov=horse_racing_game --cov-report=term-missing --cov-fail-under=80 --tb=short -q
+
+  release-build:
+    runs-on: windows-latest
+    needs: test
+    env:
+      SDL_VIDEODRIVER: dummy
+      SDL_AUDIODRIVER: dummy
+      PYTHONUTF8: "1"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install release dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e . pytest pyinstaller cython setuptools
+
+      - name: Run tests
+        run: python -m pytest tests/ --tb=short -q
+
+      - name: Build unsigned Windows release
+        run: python scripts/build_release.py

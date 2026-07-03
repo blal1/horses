@@ -1,0 +1,32 @@
+{
+  "providers": [
+    {
+      "name": "elevenlabs_primary",
+      "type": "elevenlabs",
+      "api_base": "https://api.elevenlabs.io",
+      "api_key_env": "ELEVENLABS_API_KEY_1",
+      "supports": ["sound_effect", "music"]
+    },
+    {
+      "name": "elevenlabs_backup",
+      "type": "elevenlabs",
+      "api_base": "https://api.elevenlabs.io",
+      "api_key_env": "ELEVENLABS_API_KEY_2",
+      "supports": ["sound_effect", "music"]
+    },
+    {
+      "name": "custom_audio_api_example",
+      "type": "custom_http",
+      "api_base": "http://127.0.0.1:8000",
+      "api_key_env": "OTHER_AUDIO_API_KEY",
+      "auth_header": "Authorization",
+      "auth_scheme": "Bearer",
+      "supports": ["sound_effect", "music"],
+      "sfx_endpoint": "/generate-sfx",
+      "music_endpoint": "/generate-music",
+      "extra_body": {
+        "format": "mp3"
+      }
+    }
+  ]
+}

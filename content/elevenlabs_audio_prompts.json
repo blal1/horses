@@ -1,0 +1,785 @@
+﻿{
+  "schema_version": 1,
+  "output_dir": "assets/generated/elevenlabs",
+  "generated_manifest": "content/generated_elevenlabs_sound_manifest.json",
+  "defaults": {
+    "sound_effects": {
+      "model_id": "eleven_text_to_sound_v2",
+      "output_format": "mp3_44100_128",
+      "prompt_influence": 0.75,
+      "prompt_suffix": "Production-ready game audio asset for headphones. Complete beginning, body, and natural ending within the requested duration. Clear onset, balanced dynamics, realistic source detail, no clipping, no distortion, no codec artifacts, no dead air, no abrupt cutoff."
+    },
+    "music": {
+      "model_id": "music_v2",
+      "output_format": "mp3_48000_192",
+      "force_instrumental": true
+    }
+  },
+  "assets": [
+    {
+      "id": "ui_move_soft_tick",
+      "kind": "sound_effect",
+      "category": "ui",
+      "file": "sfx/ui_move_soft_tick.mp3",
+      "duration_seconds": 0.5,
+      "loop": false,
+      "volume": 0.48,
+      "priority": 35,
+      "prompt": "One-shot soft wooden tick for menu cursor movement, warm tactile click, very short, clean transient, no reverb tail, no melody."
+    },
+    {
+      "id": "ui_change_option_pluck",
+      "kind": "sound_effect",
+      "category": "ui",
+      "file": "sfx/ui_change_option_pluck.mp3",
+      "duration_seconds": 0.5,
+      "loop": false,
+      "volume": 0.5,
+      "priority": 38,
+      "prompt": "One-shot bright but gentle plucked string UI sound for changing an option, short upward tone, accessible and non-startling, dry mix."
+    },
+    {
+      "id": "ui_confirm_warm_chime",
+      "kind": "sound_effect",
+      "category": "ui",
+      "file": "sfx/ui_confirm_warm_chime.mp3",
+      "duration_seconds": 0.8,
+      "loop": false,
+      "volume": 0.58,
+      "priority": 45,
+      "prompt": "One-shot warm confirmation chime, two soft notes, wooden stable atmosphere, positive but subtle, no long tail, game UI feedback."
+    },
+    {
+      "id": "ui_cancel_low_tap",
+      "kind": "sound_effect",
+      "category": "ui",
+      "file": "sfx/ui_cancel_low_tap.mp3",
+      "duration_seconds": 0.5,
+      "loop": false,
+      "volume": 0.52,
+      "priority": 45,
+      "prompt": "One-shot low muted wooden tap for cancel or back action, concise, neutral, no alarm, no voice, no music."
+    },
+    {
+      "id": "ui_error_soft_bonk",
+      "kind": "sound_effect",
+      "category": "ui",
+      "file": "sfx/ui_error_soft_bonk.mp3",
+      "duration_seconds": 0.5,
+      "loop": false,
+      "volume": 0.55,
+      "priority": 50,
+      "prompt": "One-shot soft rounded bonk for invalid action, low wooden mallet tone, non-painful, short and clear, no harsh buzzer."
+    },
+    {
+      "id": "ui_open_panel_stable",
+      "kind": "sound_effect",
+      "category": "ui",
+      "file": "sfx/ui_open_panel_stable.mp3",
+      "duration_seconds": 0.7,
+      "loop": false,
+      "volume": 0.5,
+      "priority": 38,
+      "prompt": "Short stable door latch opening gently, light wood and metal, clean one-shot UI panel open, no footsteps, no ambience."
+    },
+    {
+      "id": "ui_save_success_stamp",
+      "kind": "sound_effect",
+      "category": "ui",
+      "file": "sfx/ui_save_success_stamp.mp3",
+      "duration_seconds": 0.75,
+      "loop": false,
+      "volume": 0.58,
+      "priority": 55,
+      "prompt": "One-shot parchment stamp and soft chime for save success, horse stable management UI, confident, clean, no voice."
+    },
+    {
+      "id": "race_countdown_three_beeps",
+      "kind": "sound_effect",
+      "category": "countdown",
+      "file": "sfx/race_countdown_three_beeps.mp3",
+      "duration_seconds": 2.2,
+      "loop": false,
+      "volume": 0.72,
+      "priority": 90,
+      "prompt": "Three precise race start countdown beeps followed by a subtle gate-ready click, clean timing, no spoken numbers, no music."
+    },
+    {
+      "id": "race_start_gate_snap",
+      "kind": "sound_effect",
+      "category": "race",
+      "file": "sfx/race_start_gate_snap.mp3",
+      "duration_seconds": 1.0,
+      "loop": false,
+      "volume": 0.78,
+      "priority": 95,
+      "prompt": "Horse racing starting gate snaps open, metal latches clack, brief burst of energy, realistic one-shot, no crowd roar dominating."
+    },
+    {
+      "id": "horse_player_gallop_loop_turf",
+      "kind": "sound_effect",
+      "category": "horse",
+      "file": "loops/horse_player_gallop_loop_turf.mp3",
+      "duration_seconds": 8.0,
+      "loop": true,
+      "volume": 0.62,
+      "priority": 45,
+      "prompt": "Seamless loop of close horse gallop on turf, steady four-beat hoof rhythm, athletic breathing, dry stereo, no crowd, no music."
+    },
+    {
+      "id": "horse_gallop_loop_dirt",
+      "kind": "sound_effect",
+      "category": "horse",
+      "file": "loops/horse_gallop_loop_dirt.mp3",
+      "duration_seconds": 8.0,
+      "loop": true,
+      "volume": 0.6,
+      "priority": 45,
+      "prompt": "Seamless loop of horse gallop on dry dirt track, hoof impacts with dusty grit, steady racing rhythm, no crowd, no music."
+    },
+    {
+      "id": "horse_gallop_loop_mud",
+      "kind": "sound_effect",
+      "category": "horse",
+      "file": "loops/horse_gallop_loop_mud.mp3",
+      "duration_seconds": 8.0,
+      "loop": true,
+      "volume": 0.58,
+      "priority": 45,
+      "prompt": "Seamless loop of horse gallop through wet mud, heavy hoof suction and splashes, slower weighty rhythm, no rain foreground, no music."
+    },
+    {
+      "id": "horse_breath_low_stamina",
+      "kind": "sound_effect",
+      "category": "horse",
+      "file": "sfx/horse_breath_low_stamina.mp3",
+      "duration_seconds": 2.0,
+      "loop": false,
+      "volume": 0.68,
+      "priority": 80,
+      "prompt": "Close horse breathing hard under fatigue, two strained exhales, realistic and readable, no panic, no human voice."
+    },
+    {
+      "id": "horse_push_surge",
+      "kind": "sound_effect",
+      "category": "horse",
+      "file": "sfx/horse_push_surge.mp3",
+      "duration_seconds": 1.1,
+      "loop": false,
+      "volume": 0.7,
+      "priority": 78,
+      "prompt": "Short controlled horse sprint surge, hoof rhythm accelerates, breath sharpens, energetic whoosh, no fantasy magic, no music."
+    },
+    {
+      "id": "horse_recover_exhale",
+      "kind": "sound_effect",
+      "category": "horse",
+      "file": "sfx/horse_recover_exhale.mp3",
+      "duration_seconds": 1.4,
+      "loop": false,
+      "volume": 0.52,
+      "priority": 50,
+      "prompt": "Horse recovery exhale and calmer hoof rhythm settling, realistic stable racing tone, concise, no voice."
+    },
+    {
+      "id": "horse_walk_loop_stable_yard",
+      "kind": "sound_effect",
+      "category": "horse",
+      "file": "loops/horse_walk_loop_stable_yard.mp3",
+      "duration_seconds": 8.0,
+      "loop": true,
+      "volume": 0.42,
+      "priority": 30,
+      "prompt": "Seamless loop of relaxed horse walking in a stable yard, slow clear hoofsteps on packed dirt, light tack creak, no crowd, no music."
+    },
+    {
+      "id": "horse_trot_loop_turf",
+      "kind": "sound_effect",
+      "category": "horse",
+      "file": "loops/horse_trot_loop_turf.mp3",
+      "duration_seconds": 8.0,
+      "loop": true,
+      "volume": 0.5,
+      "priority": 36,
+      "prompt": "Seamless loop of horse trotting on turf, even two-beat rhythm, moderate speed, clean hoof detail, no crowd, no music."
+    },
+    {
+      "id": "horse_canter_loop_turf",
+      "kind": "sound_effect",
+      "category": "horse",
+      "file": "loops/horse_canter_loop_turf.mp3",
+      "duration_seconds": 8.0,
+      "loop": true,
+      "volume": 0.56,
+      "priority": 40,
+      "prompt": "Seamless loop of horse cantering on turf, smooth three-beat rhythm between trot and gallop, athletic breathing, no crowd, no music."
+    },
+    {
+      "id": "horse_gallop_loop_sand",
+      "kind": "sound_effect",
+      "category": "horse",
+      "file": "loops/horse_gallop_loop_sand.mp3",
+      "duration_seconds": 8.0,
+      "loop": true,
+      "volume": 0.58,
+      "priority": 45,
+      "prompt": "Seamless loop of horse galloping on loose sand, softer heavy hoof impacts with grainy spray, steady racing rhythm, no crowd, no music."
+    },
+    {
+      "id": "horse_gallop_loop_inner_rail_close",
+      "kind": "sound_effect",
+      "category": "horse",
+      "file": "loops/horse_gallop_loop_inner_rail_close.mp3",
+      "duration_seconds": 8.0,
+      "loop": true,
+      "volume": 0.6,
+      "priority": 48,
+      "prompt": "Seamless close-perspective gallop near the inner rail, hoofbeats tight and fast, occasional rail resonance, no crowd foreground, no music."
+    },
+    {
+      "id": "horse_whinny_short_ready",
+      "kind": "sound_effect",
+      "category": "horse",
+      "file": "sfx/horse_whinny_short_ready.mp3",
+      "duration_seconds": 1.4,
+      "loop": false,
+      "volume": 0.58,
+      "priority": 55,
+      "prompt": "Short alert horse whinny before a race, natural and confident, stable yard realism, no echo, no human voice."
+    },
+    {
+      "id": "horse_neigh_excited",
+      "kind": "sound_effect",
+      "category": "horse",
+      "file": "sfx/horse_neigh_excited.mp3",
+      "duration_seconds": 1.7,
+      "loop": false,
+      "volume": 0.62,
+      "priority": 58,
+      "prompt": "Excited horse neigh, race-ready energy without panic, realistic outdoor stable sound, concise tail, no crowd, no voice."
+    },
+    {
+      "id": "horse_snort_focus",
+      "kind": "sound_effect",
+      "category": "horse",
+      "file": "sfx/horse_snort_focus.mp3",
+      "duration_seconds": 0.9,
+      "loop": false,
+      "volume": 0.55,
+      "priority": 52,
+      "prompt": "Close horse snort and nostril breath, focused and ready, dry realistic detail, very short, no human voice."
+    },
+    {
+      "id": "horse_nicker_calm",
+      "kind": "sound_effect",
+      "category": "horse",
+      "file": "sfx/horse_nicker_calm.mp3",
+      "duration_seconds": 1.2,
+      "loop": false,
+      "volume": 0.48,
+      "priority": 42,
+      "prompt": "Soft calm horse nicker in a stable, friendly low vocalization, intimate and warm, no human voice, no music."
+    },
+    {
+      "id": "horse_tack_jingle_start",
+      "kind": "sound_effect",
+      "category": "horse",
+      "file": "sfx/horse_tack_jingle_start.mp3",
+      "duration_seconds": 0.9,
+      "loop": false,
+      "volume": 0.5,
+      "priority": 45,
+      "prompt": "Horse tack and bridle jingle as horse shifts before start, leather creak and small metal rings, short realistic one-shot, no voice."
+    },
+    {
+      "id": "horse_saddle_creak_weight_shift",
+      "kind": "sound_effect",
+      "category": "horse",
+      "file": "sfx/horse_saddle_creak_weight_shift.mp3",
+      "duration_seconds": 0.8,
+      "loop": false,
+      "volume": 0.48,
+      "priority": 44,
+      "prompt": "Close saddle leather creak and rider weight shift on horse, subtle tactile detail, clean short one-shot, no hoofbeats, no voice."
+    },
+    {
+      "id": "horse_stumble_light_dirt",
+      "kind": "sound_effect",
+      "category": "horse",
+      "file": "sfx/horse_stumble_light_dirt.mp3",
+      "duration_seconds": 1.0,
+      "loop": false,
+      "volume": 0.68,
+      "priority": 86,
+      "prompt": "Horse light stumble on dirt, hoof scrape and quick recovery step, readable racing penalty cue, not violent, no voice."
+    },
+    {
+      "id": "horse_stumble_heavy_mud",
+      "kind": "sound_effect",
+      "category": "horse",
+      "file": "sfx/horse_stumble_heavy_mud.mp3",
+      "duration_seconds": 1.2,
+      "loop": false,
+      "volume": 0.7,
+      "priority": 88,
+      "prompt": "Horse heavy stumble in mud, wet hoof slip, suction splash, strained breath and recovery, urgent but safe, no human voice."
+    },
+    {
+      "id": "horse_jump_takeoff",
+      "kind": "sound_effect",
+      "category": "horse",
+      "file": "sfx/horse_jump_takeoff.mp3",
+      "duration_seconds": 0.9,
+      "loop": false,
+      "volume": 0.62,
+      "priority": 70,
+      "prompt": "Horse jump takeoff, hooves push powerfully from turf, short breath and air movement, clean one-shot, no crowd, no music."
+    },
+    {
+      "id": "horse_jump_landing",
+      "kind": "sound_effect",
+      "category": "horse",
+      "file": "sfx/horse_jump_landing.mp3",
+      "duration_seconds": 1.0,
+      "loop": false,
+      "volume": 0.66,
+      "priority": 72,
+      "prompt": "Horse lands after a jump on turf, two firm hoof impacts and quick forward recovery, realistic and controlled, no voice."
+    },
+    {
+      "id": "horse_hard_brake_skid_dirt",
+      "kind": "sound_effect",
+      "category": "horse",
+      "file": "sfx/horse_hard_brake_skid_dirt.mp3",
+      "duration_seconds": 0.9,
+      "loop": false,
+      "volume": 0.66,
+      "priority": 76,
+      "prompt": "Horse hard brake on dirt, hoof scrape skid with dust and tack jolt, short readable control cue, no crash, no voice."
+    },
+    {
+      "id": "horse_lane_change_hoof_sweep",
+      "kind": "sound_effect",
+      "category": "horse",
+      "file": "sfx/horse_lane_change_hoof_sweep.mp3",
+      "duration_seconds": 0.8,
+      "loop": false,
+      "volume": 0.54,
+      "priority": 58,
+      "prompt": "Horse lane change cue, quick lateral hoof sweep and light tack shift, spatial movement feel, short non-musical sound, no voice."
+    },
+    {
+      "id": "horse_photo_finish_stride",
+      "kind": "sound_effect",
+      "category": "horse",
+      "file": "sfx/horse_photo_finish_stride.mp3",
+      "duration_seconds": 1.2,
+      "loop": false,
+      "volume": 0.7,
+      "priority": 86,
+      "prompt": "Final desperate horse stride at finish, intense close hoofbeats and breath, one last push, clean racing cue, no crowd dominating."
+    },
+    {
+      "id": "opponent_approach_left",
+      "kind": "sound_effect",
+      "category": "race",
+      "file": "sfx/opponent_approach_left.mp3",
+      "duration_seconds": 1.3,
+      "loop": false,
+      "volume": 0.66,
+      "priority": 75,
+      "prompt": "Opponent horse approaches from the left, hoofbeats grow louder and slightly pan left, short positional cue, no voice, no music."
+    },
+    {
+      "id": "opponent_approach_right",
+      "kind": "sound_effect",
+      "category": "race",
+      "file": "sfx/opponent_approach_right.mp3",
+      "duration_seconds": 1.3,
+      "loop": false,
+      "volume": 0.66,
+      "priority": 75,
+      "prompt": "Opponent horse approaches from the right, hoofbeats grow louder and slightly pan right, short positional cue, no voice, no music."
+    },
+    {
+      "id": "opponent_pass_whoosh",
+      "kind": "sound_effect",
+      "category": "race",
+      "file": "sfx/opponent_pass_whoosh.mp3",
+      "duration_seconds": 1.0,
+      "loop": false,
+      "volume": 0.66,
+      "priority": 78,
+      "prompt": "Rival horse passes close by, fast hoofbeat sweep and light air whoosh from rear to front, realistic racing cue, no voice."
+    },
+    {
+      "id": "collision_brush_shoulders",
+      "kind": "sound_effect",
+      "category": "race",
+      "file": "sfx/collision_brush_shoulders.mp3",
+      "duration_seconds": 0.8,
+      "loop": false,
+      "volume": 0.68,
+      "priority": 88,
+      "prompt": "Two racing horses brush shoulders, leather tack jolt and hoof stumble, short impact, urgent but not violent, no crowd foreground."
+    },
+    {
+      "id": "turn_warning_left_rail",
+      "kind": "sound_effect",
+      "category": "race",
+      "file": "sfx/turn_warning_left_rail.mp3",
+      "duration_seconds": 1.0,
+      "loop": false,
+      "volume": 0.62,
+      "priority": 70,
+      "prompt": "Left turn warning cue: subtle rail rattle and curved wind sweep to the left, readable navigation earcon, no voice, no melody."
+    },
+    {
+      "id": "turn_warning_right_rail",
+      "kind": "sound_effect",
+      "category": "race",
+      "file": "sfx/turn_warning_right_rail.mp3",
+      "duration_seconds": 1.0,
+      "loop": false,
+      "volume": 0.62,
+      "priority": 70,
+      "prompt": "Right turn warning cue: subtle rail rattle and curved wind sweep to the right, readable navigation earcon, no voice, no melody."
+    },
+    {
+      "id": "final_stretch_crowd_rise",
+      "kind": "sound_effect",
+      "category": "crowd",
+      "file": "sfx/final_stretch_crowd_rise.mp3",
+      "duration_seconds": 2.5,
+      "loop": false,
+      "volume": 0.68,
+      "priority": 82,
+      "prompt": "Horse racing crowd rises as final stretch begins, controlled excitement swell, stadium perspective, no announcer voice, no music."
+    },
+    {
+      "id": "finish_line_bell_crowd",
+      "kind": "sound_effect",
+      "category": "crowd",
+      "file": "sfx/finish_line_bell_crowd.mp3",
+      "duration_seconds": 2.0,
+      "loop": false,
+      "volume": 0.75,
+      "priority": 95,
+      "prompt": "Finish line crossing: crisp bell, camera-flash-like click, and short crowd cheer, triumphant but clean, no announcer voice."
+    },
+    {
+      "id": "crowd_loop_small_track",
+      "kind": "sound_effect",
+      "category": "crowd",
+      "file": "loops/crowd_loop_small_track.mp3",
+      "duration_seconds": 20.0,
+      "loop": true,
+      "volume": 0.22,
+      "priority": 20,
+      "prompt": "Seamless loop of small horse racing crowd ambience, distant murmurs and occasional cheers, unobtrusive background, no announcer, no music."
+    },
+    {
+      "id": "crowd_loop_final_day",
+      "kind": "sound_effect",
+      "category": "crowd",
+      "file": "loops/crowd_loop_final_day.mp3",
+      "duration_seconds": 20.0,
+      "loop": true,
+      "volume": 0.25,
+      "priority": 20,
+      "prompt": "Seamless loop of larger championship crowd at racecourse, excited but not overpowering, broad outdoor ambience, no speech, no music."
+    },
+    {
+      "id": "wind_loop_clear_track",
+      "kind": "sound_effect",
+      "category": "wind",
+      "file": "loops/wind_loop_clear_track.mp3",
+      "duration_seconds": 20.0,
+      "loop": true,
+      "volume": 0.2,
+      "priority": 18,
+      "prompt": "Seamless loop of gentle open-air racecourse wind, clean outdoor air, subtle movement, no birds, no crowd, no music."
+    },
+    {
+      "id": "wind_loop_gusty_track",
+      "kind": "sound_effect",
+      "category": "wind",
+      "file": "loops/wind_loop_gusty_track.mp3",
+      "duration_seconds": 20.0,
+      "loop": true,
+      "volume": 0.26,
+      "priority": 20,
+      "prompt": "Seamless loop of gusty wind over a horse racing track, intermittent gusts, directional movement, no thunder, no music."
+    },
+    {
+      "id": "rain_loop_racecourse_light",
+      "kind": "sound_effect",
+      "category": "rain",
+      "file": "loops/rain_loop_racecourse_light.mp3",
+      "duration_seconds": 20.0,
+      "loop": true,
+      "volume": 0.28,
+      "priority": 22,
+      "prompt": "Seamless loop of light rain on racecourse rail and turf, soft droplets, outdoor texture, no thunder, no music, non-fatiguing."
+    },
+    {
+      "id": "rain_splash_hoof_one_shot",
+      "kind": "sound_effect",
+      "category": "rain",
+      "file": "sfx/rain_splash_hoof_one_shot.mp3",
+      "duration_seconds": 0.8,
+      "loop": false,
+      "volume": 0.5,
+      "priority": 45,
+      "prompt": "Single horse hoof splash in a shallow wet patch, realistic water and mud, short one-shot, no ambience tail."
+    },
+    {
+      "id": "obstacle_warning_diamond",
+      "kind": "sound_effect",
+      "category": "alert",
+      "file": "sfx/obstacle_warning_diamond.mp3",
+      "duration_seconds": 0.75,
+      "loop": false,
+      "volume": 0.72,
+      "priority": 90,
+      "prompt": "Urgent but accessible obstacle warning earcon, short wooden clack plus airy ping, no harsh alarm, no voice, no melody."
+    },
+    {
+      "id": "obstacle_hit_rail_marker",
+      "kind": "sound_effect",
+      "category": "alert",
+      "file": "sfx/obstacle_hit_rail_marker.mp3",
+      "duration_seconds": 0.9,
+      "loop": false,
+      "volume": 0.76,
+      "priority": 95,
+      "prompt": "Horse clips a lightweight rail marker, plastic and wood clatter, brief stumble, clear penalty sound, not violent, no voice."
+    },
+    {
+      "id": "obstacle_avoided_clean_pass",
+      "kind": "sound_effect",
+      "category": "alert",
+      "file": "sfx/obstacle_avoided_clean_pass.mp3",
+      "duration_seconds": 0.7,
+      "loop": false,
+      "volume": 0.52,
+      "priority": 55,
+      "prompt": "Clean pass by an obstacle, quick airy whoosh and soft positive click, short non-musical confirmation, no voice."
+    },
+    {
+      "id": "training_success_rise",
+      "kind": "sound_effect",
+      "category": "progression",
+      "file": "sfx/training_success_rise.mp3",
+      "duration_seconds": 1.4,
+      "loop": false,
+      "volume": 0.62,
+      "priority": 70,
+      "prompt": "Training completed success cue, gentle rising stable chime with soft hoof tap, satisfying but concise, no voice."
+    },
+    {
+      "id": "career_points_tally",
+      "kind": "sound_effect",
+      "category": "progression",
+      "file": "sfx/career_points_tally.mp3",
+      "duration_seconds": 1.2,
+      "loop": false,
+      "volume": 0.58,
+      "priority": 60,
+      "prompt": "Career points tally UI sound, quick parchment tick sequence ending in warm chime, horse racing management, no voice."
+    },
+    {
+      "id": "championship_standings_open",
+      "kind": "sound_effect",
+      "category": "progression",
+      "file": "sfx/championship_standings_open.mp3",
+      "duration_seconds": 1.1,
+      "loop": false,
+      "volume": 0.55,
+      "priority": 55,
+      "prompt": "Championship standings screen opens, ceremonial but subtle paper unfurl and small brass accent, no melody, no voice."
+    },
+    {
+      "id": "replay_start_tape",
+      "kind": "sound_effect",
+      "category": "replay",
+      "file": "sfx/replay_start_tape.mp3",
+      "duration_seconds": 0.9,
+      "loop": false,
+      "volume": 0.55,
+      "priority": 55,
+      "prompt": "Audio replay starts, subtle tape click and soft rewind flutter, modern clean UI cue, no voice, no music."
+    },
+    {
+      "id": "track_editor_preview_ping",
+      "kind": "sound_effect",
+      "category": "editor",
+      "file": "sfx/track_editor_preview_ping.mp3",
+      "duration_seconds": 0.65,
+      "loop": false,
+      "volume": 0.52,
+      "priority": 45,
+      "prompt": "Track editor preview ping, short spatial sonar-like wooden ping, useful for audio-first layout editing, no voice."
+    },
+    {
+      "id": "track_editor_save_track",
+      "kind": "sound_effect",
+      "category": "editor",
+      "file": "sfx/track_editor_save_track.mp3",
+      "duration_seconds": 1.1,
+      "loop": false,
+      "volume": 0.6,
+      "priority": 65,
+      "prompt": "Custom track saved, drafting compass closes, parchment stamp, soft confirmation chime, concise UI one-shot, no voice."
+    },
+    {
+      "id": "stable_oak_lane_ambience",
+      "kind": "sound_effect",
+      "category": "stable",
+      "file": "loops/stable_oak_lane_ambience.mp3",
+      "duration_seconds": 20.0,
+      "loop": true,
+      "volume": 0.2,
+      "priority": 15,
+      "prompt": "Seamless calm horse stable ambience, quiet straw movement, distant horses, soft wood creaks, peaceful, no speech, no music."
+    },
+    {
+      "id": "stable_stormforge_ambience",
+      "kind": "sound_effect",
+      "category": "stable",
+      "file": "loops/stable_stormforge_ambience.mp3",
+      "duration_seconds": 20.0,
+      "loop": true,
+      "volume": 0.22,
+      "priority": 15,
+      "prompt": "Seamless energetic racing stable ambience, tack preparation, focused movement, distant hoof stamps, no voices, no music."
+    },
+    {
+      "id": "stable_heatherbank_ambience",
+      "kind": "sound_effect",
+      "category": "stable",
+      "file": "loops/stable_heatherbank_ambience.mp3",
+      "duration_seconds": 20.0,
+      "loop": true,
+      "volume": 0.2,
+      "priority": 15,
+      "prompt": "Seamless endurance stable ambience, soft rain outside, calm horses, leather tack, patient quiet mood, no voices, no music."
+    },
+    {
+      "id": "music_menu_warm_stable",
+      "kind": "music",
+      "category": "music",
+      "file": "music/music_menu_warm_stable.mp3",
+      "duration_seconds": 45,
+      "loop": true,
+      "volume": 0.28,
+      "priority": 10,
+      "prompt": "Instrumental game menu music, warm acoustic guitar, soft piano, light stable ambience feel, calm hopeful horse racing management mood, seamless loop, no vocals, 90 BPM.",
+      "force_instrumental": true
+    },
+    {
+      "id": "music_race_tension_loop",
+      "kind": "music",
+      "category": "music",
+      "file": "music/music_race_tension_loop.mp3",
+      "duration_seconds": 45,
+      "loop": true,
+      "volume": 0.22,
+      "priority": 10,
+      "prompt": "Instrumental horse race background music, light percussion pulse and low strings, restrained tension, leaves space for SFX and voice, seamless loop, no vocals, 120 BPM.",
+      "force_instrumental": true
+    },
+    {
+      "id": "music_final_stretch_drive",
+      "kind": "music",
+      "category": "music",
+      "file": "music/music_final_stretch_drive.mp3",
+      "duration_seconds": 30,
+      "loop": true,
+      "volume": 0.24,
+      "priority": 10,
+      "prompt": "Instrumental final stretch game music, driving percussion, short string ostinato, rising excitement, clean mix with room for hoofbeats, seamless loop, no vocals, 135 BPM.",
+      "force_instrumental": true
+    },
+    {
+      "id": "music_training_focus",
+      "kind": "music",
+      "category": "music",
+      "file": "music/music_training_focus.mp3",
+      "duration_seconds": 40,
+      "loop": true,
+      "volume": 0.22,
+      "priority": 10,
+      "prompt": "Instrumental training mode loop, minimal marimba, soft hand percussion, focused and patient, stable yard mood, no vocals, seamless loop, 100 BPM.",
+      "force_instrumental": true
+    },
+    {
+      "id": "music_championship_briefing",
+      "kind": "music",
+      "category": "music",
+      "file": "music/music_championship_briefing.mp3",
+      "duration_seconds": 35,
+      "loop": true,
+      "volume": 0.24,
+      "priority": 10,
+      "prompt": "Instrumental championship briefing music, subtle brass, low strings, confident sports documentary mood, restrained, no vocals, seamless loop, 95 BPM.",
+      "force_instrumental": true
+    },
+    {
+      "id": "music_victory_short",
+      "kind": "music",
+      "category": "music",
+      "file": "music/music_victory_short.mp3",
+      "duration_seconds": 12,
+      "loop": false,
+      "volume": 0.35,
+      "priority": 35,
+      "prompt": "Short instrumental victory sting for horse racing game, warm brass and strings, triumphant but not loud, clean ending, no vocals.",
+      "force_instrumental": true
+    },
+    {
+      "id": "music_loss_reflective_short",
+      "kind": "music",
+      "category": "music",
+      "file": "music/music_loss_reflective_short.mp3",
+      "duration_seconds": 10,
+      "loop": false,
+      "volume": 0.3,
+      "priority": 35,
+      "prompt": "Short reflective instrumental result sting, soft piano and muted strings, encourages retry, not sad or dramatic, clean ending, no vocals.",
+      "force_instrumental": true
+    }
+  ],
+  "providers": [
+    {
+      "name": "elevenlabs_primary",
+      "type": "elevenlabs",
+      "api_base": "https://api.elevenlabs.io",
+      "api_key_env": "ELEVENLABS_API_KEY",
+      "supports": [
+        "sound_effect",
+        "music"
+      ]
+    },
+    {
+      "name": "elevenlabs_backup_1",
+      "type": "elevenlabs",
+      "api_base": "https://api.elevenlabs.io",
+      "api_key_env": "ELEVENLABS_API_KEY_2",
+      "supports": [
+        "sound_effect",
+        "music"
+      ]
+    },
+    {
+      "name": "elevenlabs_backup_2",
+      "type": "elevenlabs",
+      "api_base": "https://api.elevenlabs.io",
+      "api_key_env": "ELEVENLABS_API_KEY_3",
+      "supports": [
+        "sound_effect",
+        "music"
+      ]
+    }
+  ]
+}

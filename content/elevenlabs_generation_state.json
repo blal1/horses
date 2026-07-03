@@ -1,0 +1,68 @@
+{
+  "assets": {
+    "music_championship_briefing": {
+      "attempts": null,
+      "error": "No provider available for music. Check API keys/providers and supports lists.",
+      "kind": "music",
+      "path": "C:/Users/bilal/Downloads/horses/assets/generated/elevenlabs/music/music_championship_briefing.mp3",
+      "provider": null,
+      "status": "failed",
+      "updated_at": "2026-06-25T17:40:54.351756+00:00"
+    },
+    "music_final_stretch_drive": {
+      "attempts": null,
+      "error": "No provider available for music. Check API keys/providers and supports lists.",
+      "kind": "music",
+      "path": "C:/Users/bilal/Downloads/horses/assets/generated/elevenlabs/music/music_final_stretch_drive.mp3",
+      "provider": null,
+      "status": "failed",
+      "updated_at": "2026-06-25T17:40:54.351756+00:00"
+    },
+    "music_loss_reflective_short": {
+      "attempts": null,
+      "error": "No provider available for music. Check API keys/providers and supports lists.",
+      "kind": "music",
+      "path": "C:/Users/bilal/Downloads/horses/assets/generated/elevenlabs/music/music_loss_reflective_short.mp3",
+      "provider": null,
+      "status": "failed",
+      "updated_at": "2026-06-25T17:40:54.361978+00:00"
+    },
+    "music_menu_warm_stable": {
+      "attempts": null,
+      "error": "All providers failed for music_menu_warm_stable:\n- elevenlabs_key_1 API error 402 for https://api.elevenlabs.io/v1/music?output_format=mp3_48000_192: {\"detail\":{\"type\":\"payment_required\",\"code\":\"paid_plan_required\",\"message\":\"Music API is not available for free users. Please upgrade to a paid plan to use the API.\",\"status\":\"limited_access\",\"request_id\":\"2034fa8b0f0f1b3b24d2f992f2f2a9a5\"}}",
+      "kind": "music",
+      "path": "C:/Users/bilal/Downloads/horses/assets/generated/elevenlabs/music/music_menu_warm_stable.mp3",
+      "provider": null,
+      "status": "failed",
+      "updated_at": "2026-06-25T17:40:54.348354+00:00"
+    },
+    "music_race_tension_loop": {
+      "attempts": null,
+      "error": "No provider available for music. Check API keys/providers and supports lists.",
+      "kind": "music",
+      "path": "C:/Users/bilal/Downloads/horses/assets/generated/elevenlabs/music/music_race_tension_loop.mp3",
+      "provider": null,
+      "status": "failed",
+      "updated_at": "2026-06-25T17:40:54.351756+00:00"
+    },
+    "music_training_focus": {
+      "attempts": null,
+      "error": "No provider available for music. Check API keys/providers and supports lists.",
+      "kind": "music",
+      "path": "C:/Users/bilal/Downloads/horses/assets/generated/elevenlabs/music/music_training_focus.mp3",
+      "provider": null,
+      "status": "failed",
+      "updated_at": "2026-06-25T17:40:54.351756+00:00"
+    },
+    "music_victory_short": {
+      "attempts": null,
+      "error": "No provider available for music. Check API keys/providers and supports lists.",
+      "kind": "music",
+      "path": "C:/Users/bilal/Downloads/horses/assets/generated/elevenlabs/music/music_victory_short.mp3",
+      "provider": null,
+      "status": "failed",
+      "updated_at": "2026-06-25T17:40:54.351756+00:00"
+    }
+  },
+  "updated_at": "2026-06-25T17:40:54.361978+00:00"
+}
