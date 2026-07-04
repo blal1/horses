@@ -2,10 +2,15 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from horse_racing_game.app.progress import GameProgress
+from horse_racing_game.app.progress import GameProgress, load_progress
 from horse_racing_game.app.replay import RaceReplay, ReplayTimeline
 from horse_racing_game.app.replay import replay_to_dict
-from horse_racing_game.app.replay_exports import build_last_replay_share_bundle, load_replay_share_index, save_replay_share_bundle
+from horse_racing_game.app.replay_exports import (
+    build_last_replay_share_bundle,
+    import_replay_share,
+    load_replay_share_index,
+    save_replay_share_bundle,
+)
 from horse_racing_game.app.replay_sharing import (
     ReplayBrowser,
     ReplayLibraryEntry,
@@ -139,6 +144,29 @@ class ReplaySharingTests(unittest.TestCase):
             self.assertEqual(index[0].title, "Last Race Replay")
             self.assertEqual(index[0].track_id, "ashford_oval")
             self.assertEqual(len(index[0].files), 7)
+
+    def test_import_replay_share_sets_last_replay_and_lines(self) -> None:
+        root = Path(__file__).parent.parent
+        progress = GameProgress(last_replay=replay_to_dict(self._replay()), last_replay_lines=("Replay line one.",))
+        with tempfile.TemporaryDirectory() as directory:
+            project_root = Path(directory)
+            bundle = build_last_replay_share_bundle(root / "content", progress)
+            assert bundle is not None
+            save_replay_share_bundle(project_root, bundle)
+
+            imported = import_replay_share(project_root, root / "content", "last-replay", GameProgress())
+
+            assert imported is not None
+            self.assertEqual(imported.replay_id, "last-replay")
+            self.assertEqual(imported.progress.last_replay["track_id"], "ashford_oval")
+            self.assertEqual(imported.progress.last_track_id, "ashford_oval")
+            self.assertTrue(imported.replay_lines)
+            self.assertEqual(load_progress(project_root).last_replay["track_id"], "ashford_oval")
+
+    def test_import_replay_share_returns_none_for_missing_or_bad_payload(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            project_root = Path(directory)
+            self.assertIsNone(import_replay_share(project_root, Path("missing-content"), "missing", GameProgress()))
 
     def test_replay_share_index_skips_corrupt_or_incomplete_manifests(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

@@ -11,6 +11,7 @@ from horse_racing_game.app.savedata import atomic_write_json, load_json_object
 CLUB_ROLES = {"owner", "moderator", "member"}
 REPORT_STATUSES = {"open", "reviewed", "dismissed"}
 MODERATION_ACTIONS = {"warn", "mute", "kick", "ban"}
+APPEAL_STATUSES = {"open", "approved", "denied"}
 
 
 @dataclass(frozen=True)
@@ -146,6 +147,60 @@ class ModerationAction:
 
 
 @dataclass(frozen=True)
+class ModerationAppeal:
+    appeal_id: str
+    action_id: str
+    club_id: str
+    player_id: str
+    reason: str
+    status: str = "open"
+    reviewer_id: str = ""
+    resolution_note: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.appeal_id:
+            raise ValueError("appeal_id must be non-empty")
+        if not self.action_id:
+            raise ValueError("action_id must be non-empty")
+        if not self.club_id:
+            raise ValueError("club_id must be non-empty")
+        if not self.player_id:
+            raise ValueError("player_id must be non-empty")
+        if not self.reason:
+            raise ValueError("reason must be non-empty")
+        if self.status not in APPEAL_STATUSES:
+            raise ValueError("invalid appeal status")
+        if self.status != "open" and not self.reviewer_id:
+            raise ValueError("reviewer_id must be non-empty for resolved appeals")
+
+
+@dataclass(frozen=True)
+class ModerationAuditEntry:
+    audit_id: str
+    club_id: str
+    actor_id: str
+    target_id: str
+    event_type: str
+    subject_id: str
+    note: str
+    timestamp_s: float = 0.0
+
+    def __post_init__(self) -> None:
+        if not self.audit_id:
+            raise ValueError("audit_id must be non-empty")
+        if not self.club_id:
+            raise ValueError("club_id must be non-empty")
+        if not self.actor_id:
+            raise ValueError("actor_id must be non-empty")
+        if not self.target_id:
+            raise ValueError("target_id must be non-empty")
+        if not self.event_type:
+            raise ValueError("event_type must be non-empty")
+        if not self.subject_id:
+            raise ValueError("subject_id must be non-empty")
+
+
+@dataclass(frozen=True)
 class ProfanityControl:
     blocked_terms: tuple[str, ...] = ()
     replacement: str = "[filtered]"
@@ -192,6 +247,8 @@ class CommunitySnapshot:
     scheduled_events: tuple[ScheduledEvent, ...]
     open_reports: tuple[MessageReport, ...]
     moderation_actions: tuple[ModerationAction, ...]
+    open_appeals: tuple[ModerationAppeal, ...]
+    audit_entries: tuple[ModerationAuditEntry, ...]
 
 
 class CommunityHub:
@@ -206,6 +263,8 @@ class CommunityHub:
         self._events: dict[str, ScheduledEvent] = {}
         self._reports: dict[str, MessageReport] = {}
         self._actions: dict[str, ModerationAction] = {}
+        self._appeals: dict[str, ModerationAppeal] = {}
+        self._audit_entries: dict[str, ModerationAuditEntry] = {}
         self._banned: set[tuple[str, str]] = set()
         self._muted_until: dict[tuple[str, str], float] = {}
         self._profanity = profanity or ProfanityControl()
@@ -315,6 +374,15 @@ class CommunityHub:
             status,
         )
         self._reports[report_id] = resolved
+        self._record_audit(
+            f"audit-report-{report_id}",
+            report.club_id,
+            report.reporter_id,
+            report.message_sender_id,
+            "report_resolved",
+            report_id,
+            status,
+        )
         return resolved
 
     def apply_moderation_action(self, action: ModerationAction, timestamp_s: float = 0.0) -> ModerationAction:
@@ -328,7 +396,74 @@ class CommunityHub:
             self._banned.add((action.club_id, action.target_id))
         elif action.action == "mute":
             self._muted_until[(action.club_id, action.target_id)] = timestamp_s + (action.duration_s or 60.0)
+        self._record_audit(
+            f"audit-action-{action.action_id}",
+            action.club_id,
+            action.moderator_id,
+            action.target_id,
+            "moderation_action",
+            action.action_id,
+            f"{action.action}: {action.reason}",
+            timestamp_s,
+        )
         return action
+
+    def submit_appeal(self, appeal_id: str, action_id: str, player_id: str, reason: str) -> ModerationAppeal:
+        if appeal_id in self._appeals:
+            raise ValueError("appeal already exists")
+        action = self._action(action_id)
+        if action.target_id != player_id:
+            raise ValueError("appeal player must match moderation target")
+        appeal = ModerationAppeal(appeal_id, action_id, action.club_id, player_id, reason)
+        self._appeals[appeal_id] = appeal
+        self._record_audit(
+            f"audit-appeal-{appeal_id}",
+            action.club_id,
+            player_id,
+            action.target_id,
+            "appeal_submitted",
+            appeal_id,
+            reason,
+        )
+        return appeal
+
+    def resolve_appeal(
+        self,
+        appeal_id: str,
+        reviewer_id: str,
+        status: str,
+        resolution_note: str,
+        timestamp_s: float = 0.0,
+    ) -> ModerationAppeal:
+        appeal = self._appeal(appeal_id)
+        club = self.club(appeal.club_id)
+        if club.role_for(reviewer_id) not in {"owner", "moderator"}:
+            raise ValueError("reviewer lacks permission")
+        resolved = ModerationAppeal(
+            appeal.appeal_id,
+            appeal.action_id,
+            appeal.club_id,
+            appeal.player_id,
+            appeal.reason,
+            status,
+            reviewer_id,
+            resolution_note,
+        )
+        self._appeals[appeal_id] = resolved
+        if status == "approved":
+            self._banned.discard((appeal.club_id, appeal.player_id))
+            self._muted_until.pop((appeal.club_id, appeal.player_id), None)
+        self._record_audit(
+            f"audit-appeal-resolution-{appeal_id}",
+            appeal.club_id,
+            reviewer_id,
+            appeal.player_id,
+            "appeal_resolved",
+            appeal_id,
+            f"{status}: {resolution_note}",
+            timestamp_s,
+        )
+        return resolved
 
     def is_banned(self, club_id: str, player_id: str) -> bool:
         return (club_id, player_id) in self._banned
@@ -347,6 +482,13 @@ class CommunityHub:
                 )
             ),
             moderation_actions=tuple(sorted(self._actions.values(), key=lambda action: action.action_id)),
+            open_appeals=tuple(
+                sorted(
+                    (appeal for appeal in self._appeals.values() if appeal.status == "open"),
+                    key=lambda appeal: appeal.appeal_id,
+                )
+            ),
+            audit_entries=tuple(sorted(self._audit_entries.values(), key=lambda entry: entry.audit_id)),
         )
 
     def chat_snapshot(self) -> tuple[tuple[str, tuple[ClubChatMessage, ...]], ...]:
@@ -361,6 +503,12 @@ class CommunityHub:
     def muted_until_snapshot(self) -> tuple[tuple[str, str, float], ...]:
         return tuple(sorted((club_id, player_id, timestamp) for (club_id, player_id), timestamp in self._muted_until.items()))
 
+    def appeals_snapshot(self) -> tuple[ModerationAppeal, ...]:
+        return tuple(sorted(self._appeals.values(), key=lambda appeal: appeal.appeal_id))
+
+    def audit_snapshot(self) -> tuple[ModerationAuditEntry, ...]:
+        return tuple(sorted(self._audit_entries.values(), key=lambda entry: entry.audit_id))
+
     def _event(self, event_id: str) -> ScheduledEvent:
         try:
             return self._events[event_id]
@@ -372,6 +520,33 @@ class CommunityHub:
             return self._reports[report_id]
         except KeyError as error:
             raise ValueError(f"unknown report id: {report_id}") from error
+
+    def _action(self, action_id: str) -> ModerationAction:
+        try:
+            return self._actions[action_id]
+        except KeyError as error:
+            raise ValueError(f"unknown moderation action id: {action_id}") from error
+
+    def _appeal(self, appeal_id: str) -> ModerationAppeal:
+        try:
+            return self._appeals[appeal_id]
+        except KeyError as error:
+            raise ValueError(f"unknown appeal id: {appeal_id}") from error
+
+    def _record_audit(
+        self,
+        audit_id: str,
+        club_id: str,
+        actor_id: str,
+        target_id: str,
+        event_type: str,
+        subject_id: str,
+        note: str,
+        timestamp_s: float = 0.0,
+    ) -> ModerationAuditEntry:
+        entry = ModerationAuditEntry(audit_id, club_id, actor_id, target_id, event_type, subject_id, note, timestamp_s)
+        self._audit_entries[audit_id] = entry
+        return entry
 
 
 def community_hub_path(project_root: Path) -> Path:
@@ -391,6 +566,8 @@ def save_community_hub(project_root: Path, hub: CommunityHub) -> None:
             "scheduled_events": [asdict(event) for event in snapshot.scheduled_events],
             "reports": [asdict(report) for report in hub.reports_snapshot()],
             "moderation_actions": [asdict(action) for action in snapshot.moderation_actions],
+            "appeals": [asdict(appeal) for appeal in hub.appeals_snapshot()],
+            "audit_entries": [asdict(entry) for entry in hub.audit_snapshot()],
             "banned": [list(item) for item in hub.banned_snapshot()],
             "muted_until": [
                 {"club_id": club_id, "player_id": player_id, "until_s": until_s}
@@ -469,6 +646,34 @@ def load_community_hub(project_root: Path) -> CommunityHub:
             )
             hub.club(action.club_id)
             hub._actions[action.action_id] = action
+        for item in _list(data.get("appeals")):
+            appeal = ModerationAppeal(
+                str(item.get("appeal_id") or ""),
+                str(item.get("action_id") or ""),
+                str(item.get("club_id") or ""),
+                str(item.get("player_id") or ""),
+                str(item.get("reason") or ""),
+                str(item.get("status") or "open"),
+                str(item.get("reviewer_id") or ""),
+                str(item.get("resolution_note") or ""),
+            )
+            hub.club(appeal.club_id)
+            if appeal.action_id not in hub._actions:
+                raise ValueError("appeal references unknown action")
+            hub._appeals[appeal.appeal_id] = appeal
+        for item in _list(data.get("audit_entries")):
+            entry = ModerationAuditEntry(
+                str(item.get("audit_id") or ""),
+                str(item.get("club_id") or ""),
+                str(item.get("actor_id") or ""),
+                str(item.get("target_id") or ""),
+                str(item.get("event_type") or ""),
+                str(item.get("subject_id") or ""),
+                str(item.get("note") or ""),
+                float(item.get("timestamp_s") or 0.0),
+            )
+            hub.club(entry.club_id)
+            hub._audit_entries[entry.audit_id] = entry
         for first, second in _pair_list(data.get("banned")):
             hub.club(first)
             hub._banned.add((first, second))

@@ -212,7 +212,7 @@ class PygameMultiplayerRaceGame:
             return False, "restart"
         if key == pygame.K_p:
             self._paused = not self._paused
-        elif key == pygame.K_h or key == pygame.K_F1:
+        elif key == pygame.K_F1:
             self._show_help = not self._show_help
             self._messages.appendleft(HELP_TEXT)
         return running, next_action
@@ -227,11 +227,11 @@ class PygameMultiplayerRaceGame:
             self._messages.appendleft(f"Chat sender: {self._chat.composer.sender_label}")
             return running, next_action
         if self._chat_mode == "voice":
-            if key in {pygame.K_LEFT, pygame.K_UP}:
+            if key == pygame.K_UP:
                 self._chat.cycle_voice_macro(-1)
                 self._messages.appendleft(f"Voice line: {self._chat.composer.voice_macro}")
                 return running, next_action
-            if key in {pygame.K_RIGHT, pygame.K_DOWN}:
+            if key == pygame.K_DOWN:
                 self._chat.cycle_voice_macro(1)
                 self._messages.appendleft(f"Voice line: {self._chat.composer.voice_macro}")
                 return running, next_action
@@ -285,7 +285,7 @@ class PygameMultiplayerRaceGame:
 
     def _draw_header(self, screen: pygame.Surface, fonts: "_Fonts") -> None:
         screen.blit(fonts.title.render("Multiplayer Duel", True, (248, 240, 205)), (48, 26))
-        screen.blit(fonts.small.render("Two lockstep peers. Host uses arrows/WASD. Guest uses TGFH/RYUO.", True, (156, 182, 194)), (50, 72))
+        screen.blit(fonts.small.render("Two lockstep peers. Host uses arrows/ZQSD. Guest uses TGFH/RYUO.", True, (156, 182, 194)), (50, 72))
 
     def _draw_peer_panel(self, screen: pygame.Surface, fonts: "_Fonts", state: RaceState, accent: tuple[int, int, int], x: int, label: str, input_text: str, track_length_m: float) -> None:
         panel = pygame.Rect(x, 110, 552, 390)
@@ -328,7 +328,7 @@ class PygameMultiplayerRaceGame:
         screen.blit(fonts.body.render(header, True, (244, 246, 238)), (panel.left + 16, panel.top + 14))
         if self._chat_mode == "voice":
             hint = f"Voice line: {self._chat.composer.voice_macro}"
-            draft = "Up/Down voice | Left/Right sender | Enter send | Esc exit"
+            draft = "Up/Down voice | Tab sender | Enter send | Esc exit"
         elif self._chat_mode == "text":
             hint = f"> {self._chat.composer.draft}"
             draft = "Type message | Enter send | Tab sender | Esc exit"
@@ -347,7 +347,7 @@ class PygameMultiplayerRaceGame:
         footer = pygame.Rect(48, 692, 1144, 40)
         pygame.draw.rect(screen, (26, 30, 36), footer, border_radius=6)
         pygame.draw.rect(screen, (88, 96, 108), footer, width=2, border_radius=6)
-        text = f"Tick {tick_index} | P pause | H help | M menu | N restart | Esc quit"
+        text = f"Tick {tick_index} | P pause | F1 help | M menu | N restart | Esc quit"
         screen.blit(fonts.small.render(text, True, (245, 220, 130)), (footer.left + 18, footer.top + 11))
 
     def _draw_overlay(self, screen: pygame.Surface, fonts: "_Fonts", text: str) -> None:

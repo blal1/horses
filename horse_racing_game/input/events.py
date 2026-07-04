@@ -21,14 +21,14 @@ class ControlScheme:
 
 
 DEFAULT_CONTROL_SCHEME = ControlScheme(
-    throttle_up=(pygame.K_UP, pygame.K_w, pygame.K_z),
+    throttle_up=(pygame.K_UP, pygame.K_z),
     throttle_down=(pygame.K_DOWN, pygame.K_s),
-    lateral_left=(pygame.K_LEFT, pygame.K_a, pygame.K_q),
+    lateral_left=(pygame.K_LEFT, pygame.K_q),
     lateral_right=(pygame.K_RIGHT, pygame.K_d),
-    push=(pygame.K_SPACE,),
-    jump=(pygame.K_j,),
-    duck=(pygame.K_k, pygame.K_LCTRL, pygame.K_RCTRL),
-    status=(pygame.K_TAB, pygame.K_RETURN),
+    push=(pygame.K_j,),
+    jump=(pygame.K_SPACE,),
+    duck=(pygame.K_LCTRL, pygame.K_RCTRL),
+    status=(pygame.K_TAB,),
 )
 
 MULTIPLAYER_GUEST_SCHEME = ControlScheme(

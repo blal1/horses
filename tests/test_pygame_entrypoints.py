@@ -57,6 +57,7 @@ class PygameEntrypointTests(unittest.TestCase):
     def test_pygame_main_smoke_race_replay_speech_and_save_run_headless(self) -> None:
         commands = (
             (["python", "-m", "horse_racing_game.app.pygame_main", "--smoke-race"], "race ok"),
+            (["python", "-m", "horse_racing_game.app.pygame_main", "--smoke-save-sync"], "save sync ok"),
             (["python", "-m", "horse_racing_game.app.pygame_main", "--smoke-replay"], "replay ok"),
             (["python", "-m", "horse_racing_game.app.pygame_main", "--smoke-replay-share"], "replay share ok"),
             (["python", "-m", "horse_racing_game.app.pygame_main", "--smoke-replay-library"], "replay library ok"),

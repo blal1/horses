@@ -9,10 +9,13 @@ from horse_racing_game.app.difficulty import (
     difficulty_by_id,
 )
 from horse_racing_game.app.progress import GameProgress, record_race_result
+from horse_racing_game.app.config import AppConfig
+from horse_racing_game.app.pygame_main import _config_for_selection
 from horse_racing_game.domain.horse import Horse, HorseStats
 from horse_racing_game.domain.track import Track, TrackSegment
 from horse_racing_game.input.commands import RaceCommand
 from horse_racing_game.simulation.race_engine import RaceEngine
+from horse_racing_game.ui.menu_models import MenuSelection
 
 
 def _stats() -> HorseStats:
@@ -65,6 +68,27 @@ class OpponentStrengthTests(unittest.TestCase):
 
     def test_default_strength_is_deterministic(self) -> None:
         self.assertEqual(_opponent_distance(1.0), _opponent_distance(1.0))
+
+    def test_menu_difficulty_sets_non_career_config_strength(self) -> None:
+        base = AppConfig(content_root=Path("content"))
+
+        rookie = _config_for_selection(base, MenuSelection("ember_stride", "ashford_oval", difficulty_id="rookie"))
+        elite = _config_for_selection(base, MenuSelection("ember_stride", "ashford_oval", difficulty_id="elite"))
+
+        self.assertEqual(rookie.opponent_strength, difficulty_by_id("rookie").opponent_strength)
+        self.assertEqual(elite.opponent_strength, difficulty_by_id("elite").opponent_strength)
+        self.assertGreater(elite.opponent_strength, rookie.opponent_strength)
+
+    def test_explicit_strength_override_is_preserved_for_career_scaling(self) -> None:
+        base = AppConfig(content_root=Path("content"))
+
+        config = _config_for_selection(
+            base,
+            MenuSelection("ember_stride", "ashford_oval", difficulty_id="elite"),
+            opponent_strength=0.75,
+        )
+
+        self.assertEqual(config.opponent_strength, 0.75)
 
 
 class DataDrivenCareerLengthTests(unittest.TestCase):

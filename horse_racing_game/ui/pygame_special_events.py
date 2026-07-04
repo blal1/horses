@@ -17,7 +17,7 @@ class PygameSpecialEventScreen:
     returns the chosen challenge to launch (or ``None`` to return to the menu).
 
     Audio-first: the current row and its objectives/status are spoken; ``R``
-    repeats, ``Enter`` launches, ``Esc``/``M`` returns to the menu.
+    repeats, ``Space`` launches, ``Esc``/``M`` returns to the menu.
     """
 
     def __init__(
@@ -68,7 +68,7 @@ class PygameSpecialEventScreen:
         return self._challenges[self._selected_row]
 
     def _handle_key(self, key: int) -> bool:
-        if key in {pygame.K_ESCAPE, pygame.K_m, pygame.K_q}:
+        if key in {pygame.K_ESCAPE, pygame.K_m}:
             self._audio.speak("Back to the menu.", 80)
             return False
         if key == pygame.K_r:
@@ -77,10 +77,10 @@ class PygameSpecialEventScreen:
         if key in {pygame.K_UP, pygame.K_w}:
             self._selected_row = (self._selected_row - 1) % len(self._challenges)
             self._speak_selection()
-        elif key in {pygame.K_DOWN, pygame.K_s, pygame.K_TAB}:
+        elif key in {pygame.K_DOWN, pygame.K_s}:
             self._selected_row = (self._selected_row + 1) % len(self._challenges)
             self._speak_selection()
-        elif key in {pygame.K_RETURN, pygame.K_SPACE}:
+        elif key == pygame.K_SPACE:
             self.chosen_event_id = self._challenges[self._selected_row].event_id
             self._audio.speak(f"Starting {self._selected().name}.", 90)
             return False
@@ -100,7 +100,7 @@ class PygameSpecialEventScreen:
     def _intro(self) -> str:
         return (
             "Special events. Scenario challenges that reuse the race loop. "
-            f"{len(self._challenges)} available. Up and down to browse, enter to start. "
+            f"{len(self._challenges)} available. Up and down to browse, space to start. "
             + self._selection_text()
         )
 
@@ -131,7 +131,7 @@ class PygameSpecialEventScreen:
         screen.fill((18, 24, 30))
         screen.blit(title_font.render("Special Events", True, (248, 240, 205)), (58, 42))
         screen.blit(
-            small_font.render("Up/Down browse | Enter start | R repeat | M/Esc menu", True, (245, 220, 130)),
+            small_font.render("Up/Down browse | Space start | R repeat | M/Esc menu", True, (245, 220, 130)),
             (62, 92),
         )
         for index, challenge in enumerate(self._challenges):

@@ -12,7 +12,11 @@ from horse_racing_game.app.career_depth import (
     career_condition_risk,
     career_condition_status,
 )
-from horse_racing_game.app.championship import championship_title, load_championship_calendar, next_championship_race
+from horse_racing_game.app.championship import (
+    championship_title,
+    load_playable_championship_calendar,
+    next_championship_race,
+)
 from horse_racing_game.app.progress import (
     GameProgress,
     record_career_contract,
@@ -62,7 +66,7 @@ class PygameCareerHubScreen:
         self._project_root = project_root
         self._progress = progress
         self._selection = selection
-        self._calendar = load_championship_calendar(content_root / "championship.json")
+        self._calendar = load_playable_championship_calendar(content_root, project_root)
         self._stables = load_stables(content_root / "stables.json")
         catalog = load_sound_catalog(content_root / "sound_manifest.json")
         self._audio = PygameAudioBackend(project_root, catalog)
@@ -106,7 +110,7 @@ class PygameCareerHubScreen:
         return None
 
     def _handle_keydown(self, key: int) -> CareerHubResult | None:
-        if key in {pygame.K_ESCAPE, pygame.K_q, pygame.K_m}:
+        if key in {pygame.K_ESCAPE, pygame.K_m}:
             self._audio.speak("Back to the menu.", 80)
             return CareerHubResult.back()
         if key == pygame.K_r:
@@ -115,7 +119,7 @@ class PygameCareerHubScreen:
         if key in {pygame.K_UP, pygame.K_w}:
             self._selected_row = (self._selected_row - 1) % len(self._rows())
             self._speak_selection()
-        elif key in {pygame.K_DOWN, pygame.K_s, pygame.K_TAB}:
+        elif key in {pygame.K_DOWN, pygame.K_s}:
             self._selected_row = (self._selected_row + 1) % len(self._rows())
             self._speak_selection()
         elif key in {pygame.K_LEFT, pygame.K_a} and self._selected_row == 3:
@@ -136,7 +140,7 @@ class PygameCareerHubScreen:
         elif key in {pygame.K_RIGHT, pygame.K_d} and self._selected_row == 7:
             self._cycle_staff(1)
             self._speak_selection()
-        elif key in {pygame.K_RETURN, pygame.K_SPACE}:
+        elif key == pygame.K_SPACE:
             if self._selected_row == 0:
                 if self._progress.career_injury_days > 0:
                     self._audio.speak("Your horse is injured. Rest before racing.", 90)
@@ -226,7 +230,7 @@ class PygameCareerHubScreen:
         for row_index in range(len(self._rows())):
             if self._option_rect(row_index).collidepoint(position):
                 self._selected_row = row_index
-                return self._handle_keydown(pygame.K_RETURN)
+                return self._handle_keydown(pygame.K_SPACE)
         return None
 
     def _selection_for(self, mode: str) -> MenuSelection:
@@ -249,7 +253,7 @@ class PygameCareerHubScreen:
             upkeep = self._stable_management_state().weekly_cost()
             net_win = max(0, contract.prize_for_rank(1) - upkeep)
             return (
-                "Career race. Press enter to run the next championship event. "
+                "Career race. Press space to run the next championship event. "
                 f"Current contract pays {contract.prize_for_rank(1)} for a win. "
                 f"Staff upkeep will deduct {upkeep}; projected contract net {net_win}. "
                 f"Condition {self._condition_status()}, injury risk {self._condition_risk()} percent."
@@ -257,14 +261,14 @@ class PygameCareerHubScreen:
         if self._selected_row == 1:
             stable_state = self._stable_management_state()
             return (
-                "Career training. Spend one energy. Press enter to improve the selected horse. "
+                "Career training. Spend one energy. Press space to improve the selected horse. "
                 f"Stable training bonus {stable_state.training_effect_bonus('speed'):.2f}. "
                 f"Condition {self._condition_status()}, injury risk {self._condition_risk()} percent."
             )
         if self._selected_row == 2:
             return (
                 f"Career rest. Recover {self._rest_energy_gain()} energy and reduce fatigue. "
-                "Press enter to return fresh."
+                "Press space to return fresh."
             )
         if self._selected_row == 3:
             contract = self._selected_contract()
@@ -272,31 +276,31 @@ class PygameCareerHubScreen:
             return (
                 f"Choose contract. {contract.sponsor_id}. "
                 f"{status}. Requires reputation {contract.required_reputation}. Win pays {contract.prize_for_rank(1)}. "
-                "Press enter or right to change."
+                "Press space or right to change."
             )
         if self._selected_row == 4:
             contract = self._selected_contract()
             status = self._contract_status(contract)
-            return f"Contract. {contract.sponsor_id}, {status}. Press enter to sign."
+            return f"Contract. {contract.sponsor_id}, {status}. Press space to sign."
         if self._selected_row == 5:
             upgrade = self._selected_upgrade()
             return (
                 f"Choose upgrade. {upgrade.upgrade_id}, {self._upgrade_status(upgrade)}. "
-                f"Costs {upgrade.cost} rewards. Press enter or right to change."
+                f"Costs {upgrade.cost} rewards. Press space or right to change."
             )
         if self._selected_row == 6:
             upgrade = self._selected_upgrade()
-            return f"Stable upgrade. {upgrade.upgrade_id}, {self._upgrade_status(upgrade)}. Press enter to buy."
+            return f"Stable upgrade. {upgrade.upgrade_id}, {self._upgrade_status(upgrade)}. Press space to buy."
         if self._selected_row == 7:
             staff_member = self._selected_staff_member()
             return (
                 f"Choose staff. {staff_member.staff_id}, {self._staff_status(staff_member)}. "
-                f"Costs {staff_member.weekly_cost} rewards. Press enter or right to change."
+                f"Costs {staff_member.weekly_cost} rewards. Press space or right to change."
             )
         if self._selected_row == 8:
             staff_member = self._selected_staff_member()
-            return f"Stable staff. {staff_member.staff_id} costs {staff_member.weekly_cost} rewards. Press enter to hire."
-        return "Back to menu. Press enter to return."
+            return f"Stable staff. {staff_member.staff_id} costs {staff_member.weekly_cost} rewards. Press space to hire."
+        return "Back to menu. Press space to return."
 
     def _draw(
         self,
@@ -308,7 +312,7 @@ class PygameCareerHubScreen:
         screen.fill((18, 24, 30))
         screen.blit(title_font.render("Career Hub", True, (248, 240, 205)), (58, 42))
         screen.blit(
-            small_font.render("Up/Down: choice | Enter/Space: activate | R: repeat | Esc/Q/M: menu", True, (245, 220, 130)),
+            small_font.render("Up/Down: choice | Space: activate | R: repeat | Esc/M: menu", True, (245, 220, 130)),
             (62, 92),
         )
 

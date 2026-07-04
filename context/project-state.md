@@ -28,6 +28,9 @@ horse_racing_game/
 │   ├── keyboard_backend.py    Real keyboard backend
 │   ├── fake_backend.py        Scripted backend (tests)
 │   └── command_mapper.py      (shim → pygame_main:main)
+├── resources/
+│   ├── pack.py                encrypted resources.dat pack (AES-GCM entries + encrypted index)
+│   └── loader.py              ResourceProvider (pack first, loose dev files fallback)
 ├── audio/
 │   ├── audio_backend.py       AudioBackend ABC, RelativeAudioPosition
 │   ├── fake_backend.py        FakeAudioBackend, AudioCall (records calls)
@@ -58,9 +61,9 @@ horse_racing_game/
 │   ├── pygame_multiplayer.py  PygameMultiplayerScreen (lockstep duel, chat)
 │   ├── pygame_special_events.py PygameSpecialEventScreen (challenge list + completion badges)
 │   ├── pygame_stats.py        PygameStatsScreen (R repeats summary)
-│   ├── pygame_replay.py       PygameReplayScreen
-│   └── pygame_track_editor.py PygameTrackEditorScreen
-│   Every screen: back/cancel (Esc/Q/M), spoken status, R = repeat, failure feedback.
+│   ├── pygame_replay.py       PygameReplayScreen (timeline playback; S export, Tab select share, I import)
+│   └── pygame_track_editor.py PygameTrackEditorScreen (3 custom slots + catalog publish/rate/discover/select)
+│   Screens use context-specific back/cancel keys (main menu Esc/Q; most secondary screens Esc/M; read-only result screens exit on any non-R key), spoken status, R = repeat, failure feedback.
 └── app/
     ├── pygame_main.py         main(): menu ↔ modes ↔ progress orchestration
     ├── config.py              AppConfig, default_config
@@ -70,18 +73,22 @@ horse_racing_game/
     │                          (CAREER_LENGTH default; real length is data-driven from calendar)
     ├── difficulty.py          DifficultyTier (opponent_strength + reward_multiplier),
     │                          DIFFICULTY_TIERS (Rookie/Pro/Elite), career_difficulty
-    ├── championship.py        load_championship_calendar (9-race season), next_championship_race, standings
+    ├── championship.py        load_championship_calendar (9-race season), playable calendar + custom exhibitions,
+    │                          next_championship_race, standings
     ├── special_events.py      SpecialEventChallenge catalog, evaluate/score objectives,
     │                          run_special_event, record/load → save/special_events.json
     ├── training.py            training levels 0–5, apply_training_boost
     ├── progress.py            GameProgress, load/record/save → save/progress.json
     ├── replay.py              build_replay_lines; RaceReplay + reconstruct_race (seed+command replay)
+    ├── replay_exports.py      save/load replay shares, local share index, import command-log shares
+    ├── package_build.py       protected default asset rules use dist/resources.dat, reject raw content/assets
     ├── stats.py               season stats helpers
-    ├── track_editor.py        load_available_tracks, custom tracks
+    ├── track_editor.py        load_available_tracks, 3 named custom track slots
     └── runtime_log.py         write_runtime_log → runtime_debug.log
 
-content/   *.json game data        save/progress.json   mutable state
-assets/ sfx/   audio files         tests/   pytest suite (1 file per subsystem)
+content/   dev JSON game data      assets/ sfx/   dev audio files
+dist/resources.dat encrypted release resource pack
+save/progress.json mutable state   tests/   pytest suite (1 file per subsystem)
 launchers: play_game.py, c.py, PLAY_GAME.bat, [project.scripts] horse-racing-game
 ```
 
@@ -125,7 +132,7 @@ Determinism: `RaceEngine._rng = random.Random(config.seed)` is the only randomne
 - `VoiceFeedbackController.observe_events / repeat_last / speak_help`.
 
 ### `app/pygame_main.py`
-- **Intent:** Top-level orchestration. `main()`, `_config_for_selection(...)`.
+- **Intent:** Top-level orchestration. `main()`, `_config_for_selection(...)` (selection difficulty becomes opponent strength unless an explicit career override is supplied).
 - Menu → mode dispatch (race/tutorial/training/career→hub/obstacle_lab/time_trial/ghost_race/special_event/replay/track_editor/stats/profile/multiplayer) → `PygameRaceGame.run()` → record progress. `_run_special_event_mode` opens the challenge screen, races the pick, scores/persists it. Logs cue-audio coverage at startup; `--smoke-*` headless entrypoints incl. `--smoke-special-event`.
 
 ### `app/bootstrap.py`
@@ -138,7 +145,7 @@ Determinism: `RaceEngine._rng = random.Random(config.seed)` is the only randomne
 - `GameProgress` (selections, counts, wins/podiums/best_rank, training levels, rival stats, last_replay_lines); `load_progress`, `record_race_result`, `record_rival_encounter`, `record_rival_championship_result`, `progress_path`.
 
 ### `app/career.py` / `championship.py` / `training.py`
-- `points_for_rank` (10/7/5/3/1), `career_reward_for_rank`, `career_title`; career length is data-driven from the 9-race calendar (`_career_cap`), and `record_race_result` scales base rewards by the escalating tier's `reward_multiplier`. `ChampionshipRace`, `StandingRow`, `next_championship_race`, `championship_title`; `MAX_TRAINING_LEVEL=5`, `apply_training_boost`, `next_training_level`.
+- `points_for_rank` (10/7/5/3/1), `career_reward_for_rank`, `career_title`; career length is data-driven from the playable calendar (`_career_cap`), including appended local custom-track exhibitions when saved custom tracks exist, and `record_race_result` scales base rewards by the escalating tier's `reward_multiplier`. `ChampionshipRace`, `StandingRow`, `next_championship_race`, `championship_title`; `MAX_TRAINING_LEVEL=5`, `apply_training_boost`, `next_training_level`.
 
 ### `app/special_events.py`
 - `SpecialEventChallenge` (spec + `ScenarioObjective`s), `default_special_events()` (Fog Sprint Gauntlet / Highcliff Endurance Climb / Ashford Champion Charge), `observed_values_for` / `evaluate_special_event` (score a finished `RaceState`), `run_special_event` (drives the core loop), `record_special_event_result` / `load_special_event_records` → `save/special_events.json`.

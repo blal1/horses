@@ -6,6 +6,7 @@ from horse_racing_game.app.community import (
     Club,
     ClubMember,
     CommunityHub,
+    ModerationAppeal,
     ModerationAction,
     ProfanityControl,
     RateLimitRule,
@@ -91,6 +92,31 @@ class CommunityHubTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.hub.post_team_message("club-1", "bob", "banned", timestamp_s=40.0)
 
+    def test_moderation_appeals_and_audit_state(self) -> None:
+        action = self.hub.apply_moderation_action(
+            ModerationAction("action-1", "club-1", "carol", "bob", "mute", "cooldown", duration_s=30.0),
+            timestamp_s=10.0,
+        )
+
+        appeal = self.hub.submit_appeal("appeal-1", action.action_id, "bob", "I understand the rule now")
+
+        self.assertEqual(appeal.status, "open")
+        self.assertEqual(self.hub.snapshot().open_appeals, (appeal,))
+        self.assertIn("audit-action-action-1", {entry.audit_id for entry in self.hub.audit_snapshot()})
+        self.assertIn("audit-appeal-appeal-1", {entry.audit_id for entry in self.hub.audit_snapshot()})
+        with self.assertRaises(ValueError):
+            self.hub.submit_appeal("appeal-2", action.action_id, "alice", "wrong target")
+        with self.assertRaises(ValueError):
+            self.hub.resolve_appeal("appeal-1", "bob", "approved", "not a moderator")
+
+        resolved = self.hub.resolve_appeal("appeal-1", "alice", "approved", "mute lifted", timestamp_s=15.0)
+
+        self.assertEqual(resolved.status, "approved")
+        self.assertEqual(resolved.reviewer_id, "alice")
+        self.assertFalse(self.hub.is_muted("club-1", "bob", 20.0))
+        self.assertEqual(self.hub.snapshot().open_appeals, ())
+        self.assertIn("audit-appeal-resolution-appeal-1", {entry.audit_id for entry in self.hub.audit_snapshot()})
+
     def test_snapshot_is_sorted_and_contains_public_moderation_state(self) -> None:
         self.hub.schedule_event("event-late", "club-1", "Late", 200.0, "alice")
         self.hub.schedule_event("event-early", "club-1", "Early", 100.0, "alice")
@@ -118,6 +144,8 @@ class CommunityHubTests(unittest.TestCase):
             timestamp_s=20.0,
         )
         self.hub.apply_moderation_action(ModerationAction("action-2", "club-1", "alice", "bob", "ban", "spam"))
+        self.hub.submit_appeal("appeal-1", "action-2", "bob", "false positive")
+        self.hub.resolve_appeal("appeal-1", "carol", "denied", "ban stands", timestamp_s=30.0)
         with tempfile.TemporaryDirectory() as directory:
             project_root = Path(directory)
 
@@ -128,6 +156,8 @@ class CommunityHubTests(unittest.TestCase):
             self.assertEqual(loaded.snapshot(), self.hub.snapshot())
             self.assertEqual(loaded.chat_snapshot(), self.hub.chat_snapshot())
             self.assertEqual(loaded.reports_snapshot(), self.hub.reports_snapshot())
+            self.assertEqual(loaded.appeals_snapshot(), self.hub.appeals_snapshot())
+            self.assertEqual(loaded.audit_snapshot(), self.hub.audit_snapshot())
             self.assertEqual(loaded.banned_snapshot(), self.hub.banned_snapshot())
             self.assertEqual(loaded.muted_until_snapshot(), self.hub.muted_until_snapshot())
             self.assertTrue(loaded.is_banned("club-1", "bob"))
@@ -153,6 +183,8 @@ class CommunityHubTests(unittest.TestCase):
             RateLimitRule(max_messages=0)
         with self.assertRaises(ValueError):
             ModerationAction("action", "club", "mod", "target", "shadowban", "bad action")
+        with self.assertRaises(ValueError):
+            ModerationAppeal("appeal", "action", "club", "target", "reason", "unknown")
 
 
 if __name__ == "__main__":

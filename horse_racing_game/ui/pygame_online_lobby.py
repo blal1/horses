@@ -134,10 +134,10 @@ class PygameOnlineLobbyScreen:
         if key in {pygame.K_UP, pygame.K_w}:
             self._selected_row = (self._selected_row - 1) % LOBBY_ROWS
             self._speak_row()
-        elif key in {pygame.K_DOWN, pygame.K_s, pygame.K_TAB}:
+        elif key in {pygame.K_DOWN, pygame.K_s}:
             self._selected_row = (self._selected_row + 1) % LOBBY_ROWS
             self._speak_row()
-        elif key in {pygame.K_RETURN, pygame.K_SPACE}:
+        elif key == pygame.K_SPACE:
             return self._activate_row()
         return None
 
@@ -291,7 +291,7 @@ class PygameOnlineLobbyScreen:
     ) -> None:
         screen.fill((18, 24, 30))
         screen.blit(title_font.render("Multiplayer Lobby", True, (248, 240, 205)), (58, 42))
-        screen.blit(small_font.render("Enter selects | Host waits | Join connects | R repeat | M/Esc returns", True, (245, 220, 130)), (62, 92))
+        screen.blit(small_font.render("Space selects | Host waits | Join connects | R repeat | M/Esc returns", True, (245, 220, 130)), (62, 92))
         panel = pygame.Rect(58, 132, 860, 398)
         pygame.draw.rect(screen, (31, 40, 48), panel, border_radius=6)
         pygame.draw.rect(screen, (84, 102, 116), panel, width=2, border_radius=6)
@@ -335,14 +335,14 @@ class PygameOnlineLobbyScreen:
         if row_index == 2:
             return f"Join online. Room {self._room_code}. Connect to {self._host} port {self._port}. Race starts with a synced countdown."
         if row_index == 3:
-            return f"Room code. {self._room_code}. Press enter to regenerate."
+            return f"Room code. {self._room_code}. Press space to regenerate."
         if row_index == 4:
             return f"Host address. {self._host}."
         if row_index == 5:
             return f"Port. {self._port}."
         if row_index == 6:
-            return "Ready. Press enter to toggle ready before connecting."
-        return "Reconnect. Press enter to reopen the last saved room settings."
+            return "Ready. Press space to toggle ready before connecting."
+        return "Reconnect. Press space to reopen the last saved room settings."
 
 
 def _generate_room_code() -> str:

@@ -6,7 +6,11 @@ import traceback
 
 from horse_racing_game.app.career import CAREER_LENGTH, career_energy_modifier, career_title, points_for_rank
 from horse_racing_game.app.bootstrap import build_quick_race_services
-from horse_racing_game.app.championship import championship_title, load_championship_calendar, next_championship_race
+from horse_racing_game.app.championship import (
+    championship_title,
+    load_playable_championship_calendar,
+    next_championship_race,
+)
 from horse_racing_game.app.chat import ChatModerationPolicy, ChatSession, load_chat_session, save_chat_session
 from horse_racing_game.app.config import AppConfig, default_config
 from horse_racing_game.app.community import (
@@ -48,7 +52,12 @@ from horse_racing_game.app.profile import (
     load_player_profile,
 )
 from horse_racing_game.app.replay import build_replay, build_replay_lines, reconstruct_race, replay_from_dict, replay_to_dict
-from horse_racing_game.app.replay_exports import build_last_replay_share_bundle, load_replay_share_index, save_replay_share_bundle
+from horse_racing_game.app.replay_exports import (
+    build_last_replay_share_bundle,
+    import_replay_share,
+    load_replay_share_index,
+    save_replay_share_bundle,
+)
 from horse_racing_game.app.runtime_log import write_runtime_log
 from horse_racing_game.app.social import (
     PlayerProfile as SocialPlayerProfile,
@@ -91,6 +100,8 @@ def main(argv: list[str] | None = None) -> int | None:
         return _smoke_race(project_root)
     if args.smoke_save is not None:
         return _smoke_save(project_root, args.smoke_save)
+    if args.smoke_save_sync:
+        return _smoke_save_sync(project_root)
     if args.smoke_replay:
         return _smoke_replay(project_root)
     if args.smoke_replay_share:
@@ -234,7 +245,7 @@ def main(argv: list[str] | None = None) -> int | None:
                 career_reward_tier_id: str | None = None
                 intro_message = None
                 if is_career:
-                    calendar = load_championship_calendar(base_config.content_root / "championship.json")
+                    calendar = load_playable_championship_calendar(base_config.content_root, project_root)
                     career_length = len(calendar)
                     championship_race = next_championship_race(calendar, progress.career_races_completed)
                     intro_message = championship_title(calendar, progress.career_races_completed, progress.career_points)
@@ -391,6 +402,7 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser.add_argument("--smoke-content", action="store_true", help="Validate content and service wiring without opening the UI.")
     parser.add_argument("--smoke-race", action="store_true", help="Run a deterministic headless race.")
     parser.add_argument("--smoke-save", nargs="?", const="", default=None, help="Write/read a save in a temporary or provided root.")
+    parser.add_argument("--smoke-save-sync", action="store_true", help="Upload/download a local-first save snapshot in temporary roots.")
     parser.add_argument("--smoke-replay", action="store_true", help="Build and reconstruct a deterministic replay.")
     parser.add_argument("--smoke-replay-share", action="store_true", help="Export deterministic replay share files in a temporary save.")
     parser.add_argument("--smoke-replay-library", action="store_true", help="Export and rediscover deterministic replay share metadata in a temporary save.")
@@ -473,6 +485,35 @@ def _smoke_save_at(root: Path) -> int:
     return 0 if ok else 1
 
 
+def _smoke_save_sync(project_root: Path) -> int:
+    from horse_racing_game.app.save_sync import sync_save_directory
+
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        source = root / "source"
+        target = root / "target"
+        sync_root = root / "sync"
+        record_race_result(
+            source,
+            GameProgress(),
+            "ember_stride",
+            "ashford_oval",
+            is_tutorial=False,
+            finished=True,
+            rank=1,
+        )
+        upload = sync_save_directory(source, sync_root, "desktop", 1, 10.0)
+        download = sync_save_directory(target, sync_root, "laptop", 0, 1.0)
+        loaded = load_progress(target)
+        ok = (
+            upload.decision.action == "upload"
+            and download.decision.action == "download"
+            and loaded.quick_races_completed == 1
+        )
+        print(f"save sync ok: {ok}")
+        return 0 if ok else 1
+
+
 def _smoke_replay(project_root: Path) -> int:
     config = AppConfig(content_root=project_root / "content", tick_hz=4)
     from horse_racing_game.app.game_app import GameApp
@@ -532,8 +573,15 @@ def _smoke_replay_library(project_root: Path) -> int:
         if bundle is not None:
             save_replay_share_bundle(save_root, bundle)
         index = load_replay_share_index(save_root)
-        ok = len(index) == 1 and index[0].replay_id == "last-replay" and len(index[0].files) == 7
-        print(f"replay library ok: {ok} entries={len(index)}")
+        imported = import_replay_share(save_root, project_root / "content", "last-replay", GameProgress())
+        ok = (
+            len(index) == 1
+            and index[0].replay_id == "last-replay"
+            and len(index[0].files) == 7
+            and imported is not None
+            and imported.progress.last_replay is not None
+        )
+        print(f"replay library ok: {ok} entries={len(index)} imported={imported is not None}")
         return 0 if ok else 1
 
 
@@ -707,6 +755,7 @@ def _smoke_track_catalog(project_root: Path) -> int:
             and loaded.ratings() == catalog.ratings()
             and loaded.weather_presets() == catalog.weather_presets()
             and loaded.rulesets() == catalog.rulesets()
+            and [result.track_id for result in loaded.discover(tag_id="technical")] == ["custom_turf_loop"]
         )
         print(f"track catalog ok: {ok}")
         return 0 if ok else 1
@@ -747,16 +796,20 @@ def _smoke_community(project_root: Path) -> int:
         message = hub.post_team_message("club-1", "bob", "No BADWORD lines", timestamp_s=1.0)
         report = hub.report_message("report-1", message, "alice", "review")
         hub.resolve_report(report.report_id, "reviewed")
-        hub.apply_moderation_action(
+        action = hub.apply_moderation_action(
             ModerationAction("action-1", "club-1", "carol", "bob", "mute", "cooldown", duration_s=10.0),
             timestamp_s=20.0,
         )
+        hub.submit_appeal("appeal-1", action.action_id, "bob", "understood")
+        hub.resolve_appeal("appeal-1", "alice", "approved", "mute lifted", timestamp_s=25.0)
         save_community_hub(save_root, hub)
         loaded = load_community_hub(save_root)
         ok = (
             loaded.snapshot() == hub.snapshot()
             and loaded.chat_snapshot() == hub.chat_snapshot()
             and loaded.reports_snapshot() == hub.reports_snapshot()
+            and loaded.appeals_snapshot() == hub.appeals_snapshot()
+            and loaded.audit_snapshot() == hub.audit_snapshot()
         )
         print(f"community ok: {ok}")
         return 0 if ok else 1
@@ -879,8 +932,9 @@ def _config_for_selection(
     selection: MenuSelection,
     training_level: int = 0,
     rival_stable_ids: dict[str, str] | None = None,
-    opponent_strength: float = 1.0,
+    opponent_strength: float | None = None,
 ) -> AppConfig:
+    strength = difficulty_by_id(selection.difficulty_id).opponent_strength if opponent_strength is None else opponent_strength
     return AppConfig(
         content_root=base_config.content_root,
         track_id=selection.track_id,
@@ -890,7 +944,7 @@ def _config_for_selection(
         stable_id=selection.stable_id,
         rival_stable_ids=dict(rival_stable_ids or {}),
         horse_training_level=training_level,
-        opponent_strength=opponent_strength,
+        opponent_strength=strength,
         seed=base_config.seed,
         tick_hz=60,
         max_race_seconds=base_config.max_race_seconds,

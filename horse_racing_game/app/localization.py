@@ -232,15 +232,15 @@ def default_localization_catalog() -> LocalizationCatalog:
             LocalizedString(
                 "help.controls",
                 {
-                    "en-US": "Arrows or WASD control pace and line. Space pushes.",
+                    "en-US": "Arrows or ZQSD control pace and line. J pushes.",
                     "fr-FR": "Les fleches ou ZQSD controlent le rythme et la ligne. Espace pousse.",
                 },
             ),
             LocalizedString(
                 "tutorial.status",
                 {
-                    "en-US": "Press Tab or Enter to hear rank, distance, stamina, and weather.",
-                    "fr-FR": "Appuie sur Tab ou Entree pour entendre le rang, la distance, l'endurance et la meteo.",
+                    "en-US": "Press Tab to hear rank, distance, stamina, and weather.",
+                    "fr-FR": "Appuie sur Tab pour entendre le rang, la distance, l'endurance et la meteo.",
                 },
             ),
             LocalizedString(

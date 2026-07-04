@@ -108,7 +108,7 @@ class PygameMainMenu:
             self._state.move_row(-1)
             self._play_ui("ui_move_soft_tick", 0.48, "kenney_click_001")
             self._speak_selection()
-        elif key in {pygame.K_DOWN, pygame.K_s, pygame.K_TAB}:
+        elif key in {pygame.K_DOWN, pygame.K_s}:
             self._state.move_row(1)
             self._play_ui("ui_move_soft_tick", 0.48, "kenney_click_001")
             self._speak_selection()
@@ -120,7 +120,7 @@ class PygameMainMenu:
             self._state.cycle_current_option(1)
             self._play_ui("ui_change_option_pluck", 0.5, "kenney_pluck_002")
             self._speak_selection()
-        elif key in {pygame.K_RETURN, pygame.K_SPACE}:
+        elif key == pygame.K_SPACE:
             if self._state.selected_row in {0, 1, 2, 3, 4, 5}:
                 self._state.cycle_current_option(1)
                 self._play_ui("ui_open_panel_stable", 0.5, "kenney_open_001")
@@ -254,46 +254,46 @@ class PygameMainMenu:
 
     def _selection_text(self) -> str:
         if self._state.selected_row == 0:
-            return f"Horse. {self._state.selected_horse.name}. Press enter to change."
+            return f"Horse. {self._state.selected_horse.name}. Press space to change."
         if self._state.selected_row == 1:
-            return f"Track. {self._state.selected_track.name}. Press enter to change."
+            return f"Track. {self._state.selected_track.name}. Press space to change."
         if self._state.selected_row == 2:
-            return f"Weather. {self._state.selected_weather.name}. Press enter to change."
+            return f"Weather. {self._state.selected_weather.name}. Press space to change."
         if self._state.selected_row == 3:
-            return f"Audio profile. {self._state.selected_audio_profile.name}. Press enter to change."
+            return f"Audio profile. {self._state.selected_audio_profile.name}. Press space to change."
         if self._state.selected_row == 4:
-            return f"Stable. {self._state.selected_stable.name}. {self._state.selected_stable.focus}. Press enter to change."
+            return f"Stable. {self._state.selected_stable.name}. {self._state.selected_stable.focus}. Press space to change."
         if self._state.selected_row == 5:
-            return f"Difficulty. {self._state.selected_difficulty.name}. Press enter to change."
+            return f"Difficulty. {self._state.selected_difficulty.name}. Press space to change."
         if self._state.selected_row == 6:
-            return "Quick race. Press enter to launch."
+            return "Quick race. Press space to launch."
         if self._state.selected_row == 7:
-            return "Tutorial. Press enter for guided controls."
+            return "Tutorial. Press space for guided controls."
         if self._state.selected_row == 8:
-            return "Training. Press enter to improve the selected horse."
+            return "Training. Press space to improve the selected horse."
         if self._state.selected_row == 9:
-            return "Career. Press enter to open race, training, and rest choices."
+            return "Career. Press space to open race, training, and rest choices."
         if self._state.selected_row == 10:
-            return "Obstacle lab. Press enter to test dodge, jump, and duck obstacles."
+            return "Obstacle lab. Press space to test dodge, jump, and duck obstacles."
         if self._state.selected_row == 11:
-            return "Time trial. Press enter to race the clock and save your best time."
+            return "Time trial. Press space to race the clock and save your best time."
         if self._state.selected_row == 12:
-            return "Ghost race. Press enter to race against the last saved replay."
+            return "Ghost race. Press space to race against the last saved replay."
         if self._state.selected_row == 13:
-            return "Multiplayer. Press enter for local duel or online lobby."
+            return "Multiplayer. Press space for local duel or online lobby."
         if self._state.selected_row == 14:
-            return "Replay. Press enter to hear the last race again."
+            return "Replay. Press space to hear the last race again."
         if self._state.selected_row == 15:
-            return "Track editor. Press enter to build a custom audio track."
+            return "Track editor. Press space to build a custom audio track."
         if self._state.selected_row == 16:
-            return "Profile. Press enter to view identity, wallet, and unlocks."
+            return "Profile. Press space to view identity, wallet, and unlocks."
         if self._state.selected_row == 17:
-            return "Statistics. Press enter to view season stats and standings."
+            return "Statistics. Press space to view season stats and standings."
         if self._state.selected_row == 18:
-            return "Special events. Press enter to open scenario challenges."
+            return "Special events. Press space to open scenario challenges."
         if self._state.selected_row == 19:
-            return "Quit. Press enter to exit."
-        return "Quit. Press enter to exit."
+            return "Quit. Press space to exit."
+        return "Quit. Press space to exit."
 
     def _draw(
         self,
@@ -308,7 +308,7 @@ class PygameMainMenu:
         self._draw_horse_panel(screen, body_font, small_font)
         self._draw_track_panel(screen, body_font, small_font)
         self._draw_action_hint(screen, body_font, small_font)
-        hint = small_font.render("W/S or Up/Down: row | A/D or Left/Right: change | Enter/Space: activate | R: repeat | Q/Esc: quit", True, (245, 220, 130))
+        hint = small_font.render("W/S or Up/Down: row | A/D or Left/Right: change | Space: activate | R: repeat | Q/Esc: quit", True, (245, 220, 130))
         screen.blit(hint, (60, 582))
 
     def _draw_header(self, screen: pygame.Surface, title_font: pygame.font.Font, small_font: pygame.font.Font) -> None:
@@ -325,7 +325,7 @@ class PygameMainMenu:
             ("Audio", self._state.selected_audio_profile.name),
             ("Stable", self._state.selected_stable.name),
             ("Difficulty", self._state.selected_difficulty.name),
-            ("Quick Race", "press Enter or click"),
+            ("Quick Race", "press Space or click"),
             ("Tutorial", "guided audio basics"),
             ("Training", "improve horse"),
             ("Career", "race, train, rest"),
@@ -393,47 +393,47 @@ class PygameMainMenu:
     def _draw_action_hint(self, screen: pygame.Surface, body_font: pygame.font.Font, small_font: pygame.font.Font) -> None:
         row = self._state.selected_row
         if row == 0:
-            text = "Selected: Horse - Enter/Space changes horse"
+            text = "Selected: Horse - Space changes horse"
         elif row == 1:
-            text = "Selected: Track - Enter/Space changes track"
+            text = "Selected: Track - Space changes track"
         elif row == 2:
-            text = "Selected: Weather - Enter/Space changes weather"
+            text = "Selected: Weather - Space changes weather"
         elif row == 3:
-            text = "Selected: Audio - Enter/Space changes audio profile"
+            text = "Selected: Audio - Space changes audio profile"
         elif row == 4:
-            text = "Selected: Stable - Enter/Space changes stable"
+            text = "Selected: Stable - Space changes stable"
         elif row == 5:
-            text = "Selected: Difficulty - Enter/Space changes quick race difficulty"
+            text = "Selected: Difficulty - Space changes quick race difficulty"
         elif row == 6:
-            text = "Selected: Quick Race - Enter/Space launches"
+            text = "Selected: Quick Race - Space launches"
         elif row == 7:
-            text = "Selected: Tutorial - Enter/Space starts guided help"
+            text = "Selected: Tutorial - Space starts guided help"
         elif row == 8:
-            text = "Selected: Training - Enter/Space starts improvement run"
+            text = "Selected: Training - Space starts improvement run"
         elif row == 9:
-            text = "Selected: Career - Enter/Space opens career choices"
+            text = "Selected: Career - Space opens career choices"
         elif row == 10:
-            text = "Selected: Obstacle Lab - Enter/Space starts obstacle test"
+            text = "Selected: Obstacle Lab - Space starts obstacle test"
         elif row == 11:
-            text = "Selected: Time Trial - Enter/Space starts a timed run"
+            text = "Selected: Time Trial - Space starts a timed run"
         elif row == 12:
-            text = "Selected: Ghost Race - Enter/Space races the last replay"
+            text = "Selected: Ghost Race - Space races the last replay"
         elif row == 13:
-            text = "Selected: Multiplayer - Enter/Space opens lobby"
+            text = "Selected: Multiplayer - Space opens lobby"
         elif row == 14:
-            text = "Selected: Replay - Enter/Space repeats last race"
+            text = "Selected: Replay - Space repeats last race"
         elif row == 15:
-            text = "Selected: Track Editor - Enter/Space opens editor"
+            text = "Selected: Track Editor - Space opens editor"
         elif row == 16:
-            text = "Selected: Profile - Enter/Space opens identity and wallet"
+            text = "Selected: Profile - Space opens identity and wallet"
         elif row == 17:
-            text = "Selected: Statistics - Enter/Space shows stats and standings"
+            text = "Selected: Statistics - Space shows stats and standings"
         elif row == 18:
-            text = "Selected: Special Events - Enter/Space opens scenario challenges"
+            text = "Selected: Special Events - Space opens scenario challenges"
         elif row == 19:
-            text = "Selected: Quit - Enter/Space exits"
+            text = "Selected: Quit - Space exits"
         else:
-            text = "Selected: Quit - Enter/Space exits"
+            text = "Selected: Quit - Space exits"
         panel = pygame.Rect(58, 524, 388, 50)
         pygame.draw.rect(screen, (26, 34, 42), panel, border_radius=6)
         pygame.draw.rect(screen, (94, 112, 130), panel, width=2, border_radius=6)

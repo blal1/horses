@@ -9,6 +9,11 @@ from horse_racing_game.domain.track import Track, TrackSegment
 
 CUSTOM_TRACK_ID = "custom_audio_track"
 CUSTOM_TRACK_NAME = "Custom Audio Track"
+CUSTOM_TRACK_SLOTS = (
+    (CUSTOM_TRACK_ID, CUSTOM_TRACK_NAME),
+    ("custom_audio_track_2", "Custom Audio Track 2"),
+    ("custom_audio_track_3", "Custom Audio Track 3"),
+)
 SURFACES = ("turf", "dirt", "soft_turf", "mud")
 
 
@@ -80,14 +85,19 @@ def adjust_draft(draft: TrackDraft, field_index: int, delta: int) -> TrackDraft:
     return draft
 
 
-def build_custom_track(draft: TrackDraft) -> Track:
+def custom_track_identity(slot_index: int = 0) -> tuple[str, str]:
+    return CUSTOM_TRACK_SLOTS[slot_index % len(CUSTOM_TRACK_SLOTS)]
+
+
+def build_custom_track(draft: TrackDraft, slot_index: int = 0) -> Track:
     length = draft.length_m
     curve_start = length * 0.25
     backstretch_start = length * 0.52
     final_start = length * 0.75
+    track_id, name = custom_track_identity(slot_index)
     return Track(
-        track_id=CUSTOM_TRACK_ID,
-        name=CUSTOM_TRACK_NAME,
+        track_id=track_id,
+        name=name,
         length_m=length,
         surface=draft.surface,
         lanes=6,

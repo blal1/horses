@@ -72,6 +72,44 @@ def emit_install_integrity_manifest(dist_dir: Path) -> Path:
     return write_integrity_manifest(dist_dir)
 
 
+def audit_protected_release_tree(dist_dir: Path) -> tuple[str, ...]:
+    """Return plaintext resource leaks in a protected release tree."""
+    leaks: list[str] = []
+    if not (dist_dir / "resources.dat").is_file():
+        leaks.append("missing resources.dat")
+    for name in ("content", "assets"):
+        path = dist_dir / name
+        if path.exists():
+            leaks.append(path.relative_to(dist_dir).as_posix())
+    for pattern in ("content/*.json", "assets/**/*.ogg", "assets/**/*.mp3", "assets/**/*.wav"):
+        for path in dist_dir.glob(pattern):
+            if path.is_file():
+                leaks.append(path.relative_to(dist_dir).as_posix())
+    return tuple(sorted(set(leaks)))
+
+
+def audit_sensitive_code_tree(dist_dir: Path, compiled_sources: list[str] | tuple[str, ...] = COMPILED_SOURCES) -> tuple[str, ...]:
+    """Return sensitive Python source leaks or missing native extensions."""
+    dist_dir = Path(dist_dir)
+    problems: list[str] = []
+    all_files = [path for path in dist_dir.rglob("*") if path.is_file()]
+    for rel in compiled_sources:
+        source_path = Path(rel)
+        source_posix = source_path.as_posix()
+        source_suffix = "/".join(source_path.parts[-3:])
+        for path in all_files:
+            rel_posix = path.relative_to(dist_dir).as_posix()
+            if rel_posix == source_posix or rel_posix.endswith(source_suffix):
+                problems.append(f"sensitive source shipped: {rel_posix}")
+        native_matches = [
+            path for path in all_files
+            if path.stem.startswith(source_path.stem) and path.suffix.lower() in {".pyd", ".so", ".dylib"}
+        ]
+        if not native_matches:
+            problems.append(f"missing native extension for sensitive module: {source_posix}")
+    return tuple(sorted(set(problems)))
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Hardened release build.")
     parser.add_argument("--strip-sources", action="store_true",
@@ -98,6 +136,13 @@ def main() -> None:
 
     if not args.skip_pyinstaller:
         run([PY, "-m", "PyInstaller", "--noconfirm", "HorseRacingAudioFirst.spec"])
+        leaks = audit_protected_release_tree(WINDOWS_DIST_DIR)
+        if leaks:
+            raise SystemExit("protected release contains plaintext resources: " + ", ".join(leaks))
+        if args.strip_sources:
+            code_leaks = audit_sensitive_code_tree(WINDOWS_DIST_DIR)
+            if code_leaks:
+                raise SystemExit("protected release contains readable sensitive code: " + ", ".join(code_leaks))
         if args.sign:
             if not WINDOWS_EXE.exists():
                 raise SystemExit(f"cannot sign missing executable: {WINDOWS_EXE}")

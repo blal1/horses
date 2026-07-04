@@ -5,7 +5,7 @@ from horse_racing_game.simulation.race_events import RaceEvent
 from horse_racing_game.simulation.race_state import RaceState
 
 
-HELP_TEXT = "Arrows, ZQSD, or WASD control pace and line. Space pushes. J jumps. K or Control ducks. Tab or Enter gives status. R repeats. M opens menu. N restarts. Escape quits."
+HELP_TEXT = "Arrows or ZQSD control pace and line. J pushes. Space jumps. Control ducks. Tab gives status. R repeats. M opens menu. N restarts. Escape quits."
 
 
 @dataclass(frozen=True)

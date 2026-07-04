@@ -6,7 +6,7 @@ import pygame
 from horse_racing_game.app.championship import (
     championship_rival_stables,
     compute_standings,
-    load_championship_calendar,
+    load_playable_championship_calendar,
     next_championship_race,
     standings_text,
 )
@@ -77,7 +77,7 @@ class PygameStatsScreen:
         return (
             f"Total sessions: {stats.total_races}",
             f"Quick races: {stats.quick_races}",
-            f"Career races: {stats.career_races}/{len(load_championship_calendar(self._content_root / 'championship.json'))}",
+            f"Career races: {stats.career_races}/{len(self._calendar())}",
             f"Training levels earned: {stats.training_sessions}",
             f"Wins: {stats.wins} | Podiums: {stats.podiums} | Best rank: {best}",
             f"Win rate: {stats.win_rate_percent}%",
@@ -101,7 +101,7 @@ class PygameStatsScreen:
     def _standings(self):
         rivals = load_rivals(self._content_root / "rivals.json")
         stables = load_stables(self._content_root / "stables.json")
-        calendar = load_championship_calendar(self._content_root / "championship.json")
+        calendar = self._calendar()
         return compute_standings(
             "You",
             self._progress.career_points,
@@ -114,11 +114,14 @@ class PygameStatsScreen:
         )
 
     def _next_race_line(self) -> str:
-        calendar = load_championship_calendar(self._content_root / "championship.json")
+        calendar = self._calendar()
         next_race = next_championship_race(calendar, self._progress.career_races_completed)
         if next_race is None:
             return "Next championship race: complete"
         return f"Next race: {next_race.name} on {next_race.track_id}, weather {next_race.weather_id}"
+
+    def _calendar(self):
+        return load_playable_championship_calendar(self._content_root, self._project_root)
 
     def _draw(
         self,

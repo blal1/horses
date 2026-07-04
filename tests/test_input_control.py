@@ -2,7 +2,7 @@ import unittest
 
 import pygame
 
-from horse_racing_game.input.events import KeyboardControlState, MULTIPLAYER_GUEST_SCHEME
+from horse_racing_game.input.events import DEFAULT_CONTROL_SCHEME, KeyboardControlState, MULTIPLAYER_GUEST_SCHEME
 from horse_racing_game.input.key_hold import KeyHoldTracker
 from horse_racing_game.ui.menu_models import MENU_ROW_COUNT
 
@@ -20,6 +20,16 @@ class KeyHoldTrackerTests(unittest.TestCase):
 
 
 class KeyboardControlStateTests(unittest.TestCase):
+    def test_default_control_scheme_matches_solo_key_map(self) -> None:
+        self.assertEqual(DEFAULT_CONTROL_SCHEME.throttle_up, (pygame.K_UP, pygame.K_z))
+        self.assertEqual(DEFAULT_CONTROL_SCHEME.throttle_down, (pygame.K_DOWN, pygame.K_s))
+        self.assertEqual(DEFAULT_CONTROL_SCHEME.lateral_left, (pygame.K_LEFT, pygame.K_q))
+        self.assertEqual(DEFAULT_CONTROL_SCHEME.lateral_right, (pygame.K_RIGHT, pygame.K_d))
+        self.assertEqual(DEFAULT_CONTROL_SCHEME.push, (pygame.K_j,))
+        self.assertEqual(DEFAULT_CONTROL_SCHEME.jump, (pygame.K_SPACE,))
+        self.assertEqual(DEFAULT_CONTROL_SCHEME.duck, (pygame.K_LCTRL, pygame.K_RCTRL))
+        self.assertEqual(DEFAULT_CONTROL_SCHEME.status, (pygame.K_TAB,))
+
     def test_lateral_input_decays_after_release(self) -> None:
         state = KeyboardControlState()
         state.key_down(pygame.K_RIGHT)

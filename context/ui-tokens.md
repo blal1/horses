@@ -102,7 +102,7 @@ From `audio/event_router.py` and `audio/voice_feedback.py`:
 | repeat with none | `No message to repeat.` |
 | help | full control list (`HELP_TEXT`) |
 
-`HELP_TEXT`: "Arrows, ZQSD, or WASD control pace and line. Space pushes. J jumps. K or Control ducks. Tab or Enter gives status. R repeats. M opens menu. N restarts. Escape quits."
+`HELP_TEXT`: "Arrows or ZQSD control pace and line. J pushes. Space jumps. Control ducks. Tab gives status. R repeats. M opens menu. N restarts. Escape quits."
 
 ---
 

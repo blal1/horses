@@ -19,9 +19,9 @@ Everything the player needs to make a decision must reach them through **sound**
 
 ## Menus
 
-- The menu is a flat vertical list of rows (`MENU_ROW_COUNT = 16`): selectors (rows 0–4) then actions (rows 5–15). Keep this order.
-- Up/Down move between rows; Left/Right cycle the selected selector; Enter/Space activates a row.
-- Every row has a spoken `_selection_text` line naming what it is, its current value, and what Enter does (e.g. "Track. Ashford Oval. Press enter to change.").
+- The menu is a flat vertical list of rows (`MENU_ROW_COUNT = 20`): selectors (rows 0–5) then actions (rows 6–19). Keep this order.
+- Up/Down move between rows; Left/Right cycle the selected selector; Space activates a row.
+- Every row has a spoken `_selection_text` line naming what it is, its current value, and what Space does (e.g. "Track. Ashford Oval. Press space to change.").
 - Selecting a row speaks it immediately. Activating an action speaks a short start line ("Starting tutorial.").
 - Add new selectors before actions; add new actions before Quit (keep Quit last).
 
@@ -29,8 +29,8 @@ Everything the player needs to make a decision must reach them through **sound**
 
 ## Controls
 
-- Support all three movement schemes already wired: **Arrows**, **WASD**, and **ZQSD** (AZERTY) for pace and lane.
-- Reuse existing keys; don't reassign. Pace = Up/W/Z & Down/S; lane = Left/A/Q & Right/D; Space push; J jump; K/Ctrl duck; Tab/Enter status; R repeat; M menu; N restart; Esc quit.
+- Support the current solo movement schemes: **Arrows** and **ZQSD** (AZERTY) for pace and lane.
+- Reuse existing keys; don't reassign without updating tests and help text. Pace = Up/Z & Down/S; lane = Left/Q & Right/D; J push; Space jump; Ctrl duck; Tab status; R repeat; M menu; N restart; Esc quit.
 - A control maps to a `RaceCommand` field — the UI builds the command, the engine interprets it. Don't put game logic in the key handler.
 - If you add a control, update `HELP_TEXT` (`audio/voice_feedback.py`) and the tutorial messages (`ui/pygame_game.py`).
 
@@ -79,7 +79,7 @@ Everything the player needs to make a decision must reach them through **sound**
 ## Do Nots
 
 - Never gate required information behind the visual screen.
-- Never reassign or drop an existing control scheme (Arrows/WASD/ZQSD).
+- Never reassign or drop the active control scheme without updating the input contract, UI help, and tests.
 - Never call `pygame.mixer` or NVDA directly outside `PygameAudioBackend` / `NvdaSpeaker`.
 - Never emit an audible event without a cooldown if it can repeat every tick.
 - Never hardcode a sound file path — go through the catalog with a fallback.

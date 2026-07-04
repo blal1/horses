@@ -57,7 +57,7 @@ class PygameProfileScreen:
         pygame.quit()
 
     def _handle_key(self, key: int) -> bool:
-        if key in {pygame.K_ESCAPE, pygame.K_m, pygame.K_q}:
+        if key in {pygame.K_ESCAPE, pygame.K_m}:
             return False
         if key == pygame.K_r:
             self._speak_selection()
@@ -65,7 +65,7 @@ class PygameProfileScreen:
         if key in {pygame.K_UP, pygame.K_w}:
             self._selected_row = (self._selected_row - 1) % len(self._rows())
             self._speak_selection()
-        elif key in {pygame.K_DOWN, pygame.K_s, pygame.K_TAB}:
+        elif key in {pygame.K_DOWN, pygame.K_s}:
             self._selected_row = (self._selected_row + 1) % len(self._rows())
             self._speak_selection()
         elif key in {pygame.K_LEFT, pygame.K_a}:
@@ -74,7 +74,7 @@ class PygameProfileScreen:
         elif key in {pygame.K_RIGHT, pygame.K_d}:
             self._cycle_selected(1)
             self._speak_selection()
-        elif key in {pygame.K_RETURN, pygame.K_SPACE}:
+        elif key == pygame.K_SPACE:
             self._activate_selected()
         return True
 
@@ -98,16 +98,16 @@ class PygameProfileScreen:
         if self._selected_row == 1:
             title_id = self._selected_title()
             status = "owned" if self._is_owned_or_default(title_id) else "locked"
-            return f"Title {title_id}, {status}. Left and right change. Enter equips."
+            return f"Title {title_id}, {status}. Left and right change. Space equips."
         if self._selected_row == 2:
             badge_id = self._selected_badge()
             status = "owned" if badge_id in self._profile.economy.owned_item_ids else "locked"
-            return f"Badge {badge_id}, {status}. Left and right change. Enter equips."
+            return f"Badge {badge_id}, {status}. Left and right change. Space equips."
         if self._selected_row == 3:
             cosmetic_id = self._selected_cosmetic()
             status = "owned" if cosmetic_id in self._profile.economy.owned_item_ids else "locked"
-            return f"Cosmetic {cosmetic_id}, {status}. Left and right change. Enter equips."
-        return "Back. Press enter to return."
+            return f"Cosmetic {cosmetic_id}, {status}. Left and right change. Space equips."
+        return "Back. Press space to return."
 
     def _cycle_selected(self, direction: int) -> None:
         if self._selected_row == 1:

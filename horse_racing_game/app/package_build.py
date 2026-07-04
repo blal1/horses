@@ -147,12 +147,38 @@ class BuildMatrix:
 
 
 def default_asset_rules() -> tuple[AssetRule, ...]:
+    return protected_asset_rules()
+
+
+def protected_asset_rules() -> tuple[AssetRule, ...]:
+    return (
+        AssetRule("dist/resources.dat", "."),
+        AssetRule("nvdaControllerClient64.dll", "."),
+        AssetRule("PLAY_GAME.bat", "."),
+    )
+
+
+def plaintext_resource_asset_rules() -> tuple[AssetRule, ...]:
+    """Developer-only packaging rules. Public release builds should use
+    ``protected_asset_rules`` so content/assets ship through resources.dat."""
     return (
         AssetRule("content", "content"),
         AssetRule("assets", "assets"),
         AssetRule("nvdaControllerClient64.dll", "."),
         AssetRule("PLAY_GAME.bat", "."),
     )
+
+
+def validate_protected_asset_rules(rules: tuple[AssetRule, ...]) -> tuple[str, ...]:
+    problems: list[str] = []
+    sources = {rule.source.replace("\\", "/").rstrip("/") for rule in rules}
+    destinations = {rule.destination.replace("\\", "/").rstrip("/") for rule in rules}
+    if "dist/resources.dat" not in sources:
+        problems.append("missing encrypted resource pack: dist/resources.dat")
+    for plaintext in ("content", "assets"):
+        if plaintext in sources or plaintext in destinations:
+            problems.append(f"plaintext resource directory included: {plaintext}")
+    return tuple(problems)
 
 
 def default_build_matrix(version: str = "0.1.0", channel: str = "stable") -> BuildMatrix:

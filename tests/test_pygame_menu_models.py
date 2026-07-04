@@ -66,20 +66,20 @@ class PygameMenuStateTests(unittest.TestCase):
         self.assertEqual(state.selected_stable, stables[-1])
         self.assertEqual(state.selected_difficulty.tier_id, "elite")
 
-    def test_enter_is_contextual_not_always_start(self) -> None:
+    def test_space_is_contextual_not_always_start(self) -> None:
         root = Path(__file__).parent.parent
         pygame.init()
         try:
             menu = PygameMainMenu(root / "content", root)
 
-            result = menu._handle_keydown(pygame.K_RETURN)
+            result = menu._handle_keydown(pygame.K_SPACE)
             self.assertIsNone(result.selection)
             self.assertEqual(menu._state.selected_row, 0)
             self.assertEqual(menu._state.selected_horse_index, 1)
 
             menu._handle_keydown(pygame.K_DOWN)
             self.assertEqual(menu._state.selected_row, 1)
-            result = menu._handle_keydown(pygame.K_RETURN)
+            result = menu._handle_keydown(pygame.K_SPACE)
             self.assertIsNone(result.selection)
             self.assertEqual(menu._state.selected_track_index, 1)
 
@@ -88,13 +88,13 @@ class PygameMenuStateTests(unittest.TestCase):
             menu._handle_keydown(pygame.K_DOWN)
             menu._handle_keydown(pygame.K_DOWN)
             self.assertEqual(menu._state.selected_row, 5)
-            result = menu._handle_keydown(pygame.K_RETURN)
+            result = menu._handle_keydown(pygame.K_SPACE)
             self.assertIsNone(result.selection)
             self.assertEqual(menu._state.selected_difficulty.tier_id, "elite")
 
             menu._handle_keydown(pygame.K_DOWN)
             self.assertEqual(menu._state.selected_row, 6)
-            result = menu._handle_keydown(pygame.K_RETURN)
+            result = menu._handle_keydown(pygame.K_SPACE)
             self.assertIsNotNone(result.selection)
             self.assertEqual(result.selection.mode, "race")
         finally:
@@ -154,49 +154,49 @@ class PygameMenuStateTests(unittest.TestCase):
             self.assertIn("Stable.", menu._selection_text())
 
             menu._state.selected_row = 5
-            self.assertEqual(menu._selection_text(), "Difficulty. Pro. Press enter to change.")
+            self.assertEqual(menu._selection_text(), "Difficulty. Pro. Press space to change.")
 
             menu._state.selected_row = 6
-            self.assertEqual(menu._selection_text(), "Quick race. Press enter to launch.")
+            self.assertEqual(menu._selection_text(), "Quick race. Press space to launch.")
 
             menu._state.selected_row = 7
-            self.assertEqual(menu._selection_text(), "Tutorial. Press enter for guided controls.")
+            self.assertEqual(menu._selection_text(), "Tutorial. Press space for guided controls.")
 
             menu._state.selected_row = 8
-            self.assertEqual(menu._selection_text(), "Training. Press enter to improve the selected horse.")
+            self.assertEqual(menu._selection_text(), "Training. Press space to improve the selected horse.")
 
             menu._state.selected_row = 9
-            self.assertEqual(menu._selection_text(), "Career. Press enter to open race, training, and rest choices.")
+            self.assertEqual(menu._selection_text(), "Career. Press space to open race, training, and rest choices.")
 
             menu._state.selected_row = 10
-            self.assertEqual(menu._selection_text(), "Obstacle lab. Press enter to test dodge, jump, and duck obstacles.")
+            self.assertEqual(menu._selection_text(), "Obstacle lab. Press space to test dodge, jump, and duck obstacles.")
 
             menu._state.selected_row = 11
-            self.assertEqual(menu._selection_text(), "Time trial. Press enter to race the clock and save your best time.")
+            self.assertEqual(menu._selection_text(), "Time trial. Press space to race the clock and save your best time.")
 
             menu._state.selected_row = 12
-            self.assertEqual(menu._selection_text(), "Ghost race. Press enter to race against the last saved replay.")
+            self.assertEqual(menu._selection_text(), "Ghost race. Press space to race against the last saved replay.")
 
             menu._state.selected_row = 13
-            self.assertEqual(menu._selection_text(), "Multiplayer. Press enter for local duel or online lobby.")
+            self.assertEqual(menu._selection_text(), "Multiplayer. Press space for local duel or online lobby.")
 
             menu._state.selected_row = 14
-            self.assertEqual(menu._selection_text(), "Replay. Press enter to hear the last race again.")
+            self.assertEqual(menu._selection_text(), "Replay. Press space to hear the last race again.")
 
             menu._state.selected_row = 15
-            self.assertEqual(menu._selection_text(), "Track editor. Press enter to build a custom audio track.")
+            self.assertEqual(menu._selection_text(), "Track editor. Press space to build a custom audio track.")
 
             menu._state.selected_row = 16
-            self.assertEqual(menu._selection_text(), "Profile. Press enter to view identity, wallet, and unlocks.")
+            self.assertEqual(menu._selection_text(), "Profile. Press space to view identity, wallet, and unlocks.")
 
             menu._state.selected_row = 17
-            self.assertEqual(menu._selection_text(), "Statistics. Press enter to view season stats and standings.")
+            self.assertEqual(menu._selection_text(), "Statistics. Press space to view season stats and standings.")
 
             menu._state.selected_row = 18
-            self.assertEqual(menu._selection_text(), "Special events. Press enter to open scenario challenges.")
+            self.assertEqual(menu._selection_text(), "Special events. Press space to open scenario challenges.")
 
             menu._state.selected_row = 19
-            self.assertEqual(menu._selection_text(), "Quit. Press enter to exit.")
+            self.assertEqual(menu._selection_text(), "Quit. Press space to exit.")
         finally:
             pygame.quit()
 
@@ -207,7 +207,7 @@ class PygameMenuStateTests(unittest.TestCase):
             menu = PygameMainMenu(root / "content", root)
             menu._state.selected_row = 8
 
-            result = menu._handle_keydown(pygame.K_RETURN)
+            result = menu._handle_keydown(pygame.K_SPACE)
 
             self.assertIsNotNone(result.selection)
             self.assertEqual(result.selection.mode, "training")
@@ -221,7 +221,7 @@ class PygameMenuStateTests(unittest.TestCase):
             menu = PygameMainMenu(root / "content", root)
             menu._state.selected_row = 9
 
-            result = menu._handle_keydown(pygame.K_RETURN)
+            result = menu._handle_keydown(pygame.K_SPACE)
 
             self.assertIsNotNone(result.selection)
             self.assertEqual(result.selection.mode, "career")
@@ -235,7 +235,7 @@ class PygameMenuStateTests(unittest.TestCase):
             menu = PygameMainMenu(root / "content", root)
             menu._state.selected_row = 17
 
-            result = menu._handle_keydown(pygame.K_RETURN)
+            result = menu._handle_keydown(pygame.K_SPACE)
 
             self.assertIsNotNone(result.selection)
             self.assertEqual(result.selection.mode, "stats")
@@ -249,7 +249,7 @@ class PygameMenuStateTests(unittest.TestCase):
             menu = PygameMainMenu(root / "content", root)
             menu._state.selected_row = 16
 
-            result = menu._handle_keydown(pygame.K_RETURN)
+            result = menu._handle_keydown(pygame.K_SPACE)
 
             self.assertIsNotNone(result.selection)
             self.assertEqual(result.selection.mode, "profile")
@@ -263,7 +263,7 @@ class PygameMenuStateTests(unittest.TestCase):
             menu = PygameMainMenu(root / "content", root)
             menu._state.selected_row = 15
 
-            result = menu._handle_keydown(pygame.K_RETURN)
+            result = menu._handle_keydown(pygame.K_SPACE)
 
             self.assertIsNotNone(result.selection)
             self.assertEqual(result.selection.mode, "track_editor")
@@ -277,7 +277,7 @@ class PygameMenuStateTests(unittest.TestCase):
             menu = PygameMainMenu(root / "content", root)
             menu._state.selected_row = 18
 
-            result = menu._handle_keydown(pygame.K_RETURN)
+            result = menu._handle_keydown(pygame.K_SPACE)
 
             self.assertIsNotNone(result.selection)
             self.assertEqual(result.selection.mode, "special_event")
@@ -291,7 +291,7 @@ class PygameMenuStateTests(unittest.TestCase):
             menu = PygameMainMenu(root / "content", root)
             menu._state.selected_row = 10
 
-            result = menu._handle_keydown(pygame.K_RETURN)
+            result = menu._handle_keydown(pygame.K_SPACE)
 
             self.assertIsNotNone(result.selection)
             self.assertEqual(result.selection.mode, "obstacle_lab")
@@ -305,7 +305,7 @@ class PygameMenuStateTests(unittest.TestCase):
             menu = PygameMainMenu(root / "content", root)
             menu._state.selected_row = 14
 
-            result = menu._handle_keydown(pygame.K_RETURN)
+            result = menu._handle_keydown(pygame.K_SPACE)
 
             self.assertIsNotNone(result.selection)
             self.assertEqual(result.selection.mode, "replay")
@@ -319,7 +319,7 @@ class PygameMenuStateTests(unittest.TestCase):
             menu = PygameMainMenu(root / "content", root)
             menu._state.selected_row = 13
 
-            result = menu._handle_keydown(pygame.K_RETURN)
+            result = menu._handle_keydown(pygame.K_SPACE)
 
             self.assertIsNotNone(result.selection)
             self.assertEqual(result.selection.mode, "multiplayer")
@@ -333,13 +333,13 @@ class PygameMenuStateTests(unittest.TestCase):
             menu = PygameMainMenu(root / "content", root)
             menu._state.selected_row = 11
 
-            result = menu._handle_keydown(pygame.K_RETURN)
+            result = menu._handle_keydown(pygame.K_SPACE)
 
             self.assertIsNotNone(result.selection)
             self.assertEqual(result.selection.mode, "time_trial")
 
             menu._state.selected_row = 12
-            result = menu._handle_keydown(pygame.K_RETURN)
+            result = menu._handle_keydown(pygame.K_SPACE)
 
             self.assertIsNotNone(result.selection)
             self.assertEqual(result.selection.mode, "ghost_race")

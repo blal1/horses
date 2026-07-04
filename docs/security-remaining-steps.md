@@ -76,6 +76,13 @@ Companion to `docs/superpowers/specs/2026-07-03-security-hardening-design.md`.
       (Authenticode cert). Unsigned exes trip SmartScreen and antivirus.
 - [x] **Build integrity manifest.** Emit a `sha256` manifest of shipped files;
       verify on launch to detect tampered installs (log, don't hard-block).
+- [x] **Protected resource packaging by default.** Desktop package plans now add
+      `dist/resources.dat` instead of raw `content/` and `assets/`; the
+      PyInstaller spec ships the encrypted pack when present and falls back to
+      loose folders only for developer builds.
+- [x] **Release leak audits.** `build_release.py` rejects protected builds that
+      contain plaintext `content/`/`assets/` folders or, in `--strip-sources`
+      mode, readable sensitive `.py` files without matching native extensions.
 - [x] **Reproducible build doc.** Short `BUILD.md`: prerequisites (VS Build
       Tools / MSVC, uv), exact commands, expected outputs.
 - [x] **CI build check.** GitHub Actions job that runs tests + a non-signed

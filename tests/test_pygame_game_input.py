@@ -19,12 +19,12 @@ class PygameGameInputTests(unittest.TestCase):
         game._duck_buffer_s = 0.0
         game._paused = False
 
-        running, next_action = game._handle_keydown(pygame.K_j, True, "quit")
+        running, next_action = game._handle_keydown(pygame.K_SPACE, True, "quit")
         self.assertTrue(running)
         self.assertEqual(next_action, "quit")
         self.assertGreater(game._jump_buffer_s, 0.0)
 
-        game._handle_keydown(pygame.K_k, True, "quit")
+        game._handle_keydown(pygame.K_LCTRL, True, "quit")
         self.assertGreater(game._duck_buffer_s, 0.0)
 
         game._tick_action_buffers(1.0)
@@ -92,9 +92,9 @@ class PygameGameInputTests(unittest.TestCase):
             ),
         )
 
-        game._handle_keydown(pygame.K_SPACE, True, "quit")
         game._handle_keydown(pygame.K_j, True, "quit")
-        game._handle_keydown(pygame.K_k, True, "quit")
+        game._handle_keydown(pygame.K_SPACE, True, "quit")
+        game._handle_keydown(pygame.K_LCTRL, True, "quit")
 
         self.assertEqual(
             [call.sound_id for call in backend.calls],

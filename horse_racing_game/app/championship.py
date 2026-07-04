@@ -5,6 +5,7 @@ from horse_racing_game.app.career import points_for_rank
 from horse_racing_game.content.pack_file import PackFile
 from horse_racing_game.domain.rival import RivalProfile
 from horse_racing_game.domain.stable import Stable
+from horse_racing_game.domain.track import Track
 
 
 @dataclass(frozen=True)
@@ -77,6 +78,41 @@ def load_championship_calendar(path: Path) -> tuple[ChampionshipRace, ...]:
     if not isinstance(data, list):
         raise ValueError(f"Expected a JSON array in {path}")
     return tuple(_parse_calendar_race(item, path) for item in data)
+
+
+def load_playable_championship_calendar(content_root: Path, project_root: Path) -> tuple[ChampionshipRace, ...]:
+    """Official championship calendar plus locally saved custom-track exhibitions."""
+    from horse_racing_game.app.track_editor import load_custom_tracks
+
+    return championship_calendar_with_custom_tracks(
+        load_championship_calendar(content_root / "championship.json"),
+        load_custom_tracks(project_root),
+    )
+
+
+def championship_calendar_with_custom_tracks(
+    calendar: tuple[ChampionshipRace, ...],
+    custom_tracks: tuple[Track, ...],
+) -> tuple[ChampionshipRace, ...]:
+    existing_track_ids = {race.track_id for race in calendar}
+    additions: list[ChampionshipRace] = []
+    for track in custom_tracks:
+        if track.track_id in existing_track_ids:
+            continue
+        additions.append(
+            ChampionshipRace(
+                race_id=f"custom_career_{track.track_id}",
+                name=f"Custom Career: {track.name}",
+                track_id=track.track_id,
+                weather_id="clear",
+                briefing=(
+                    f"Local custom track exhibition on {track.name}. "
+                    "Use this round to prove the saved layout works in career conditions."
+                ),
+                rival_stables={},
+            )
+        )
+    return calendar + tuple(additions)
 
 
 def next_championship_race(calendar: tuple[ChampionshipRace, ...], races_completed: int) -> ChampionshipRace | None:

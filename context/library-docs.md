@@ -34,7 +34,7 @@ pygame.mixer.music.load(path); pygame.mixer.music.play(-1)   # music loop
 **Usage here:**
 
 - **Display/clock:** `PygameRaceGame.run()` runs a fixed-rate loop (`UI_FRAME_RATE = 60`), advancing the engine one tick per frame. The menu uses a `980x640` window.
-- **Input:** key events are mapped to a `RaceCommand` (arrows / WASD / ZQSD for pace+lane, Space push, J jump, K/Ctrl duck, Tab/Enter status, R repeat, M menu, N restart, Esc quit).
+- **Input:** key events are mapped to a `RaceCommand` (arrows / ZQSD for pace+lane, J push, Space jump, Ctrl duck, Tab status, R repeat, M menu, N restart, Esc quit).
 - **Mixer:** `PygameAudioBackend` loads `SoundAsset`s into `pygame.mixer.Sound`, plays one-shot 2D/3D cues (panning via channel volume / relative position) and loops; `pygame_music.py` handles background tracks and volume.
 
 **Rules:**

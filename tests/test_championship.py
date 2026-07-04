@@ -3,15 +3,19 @@ import tempfile
 from pathlib import Path
 
 from horse_racing_game.app.championship import (
+    championship_calendar_with_custom_tracks,
     championship_rival_stables,
     championship_title,
     compute_standings,
     load_championship_calendar,
+    load_playable_championship_calendar,
     next_championship_race,
     rival_points_after_race,
     standings_text,
 )
+from horse_racing_game.app.track_editor import build_custom_track, draft_from_track, save_custom_track
 from horse_racing_game.content.loaders import load_stables
+from horse_racing_game.content.loaders import load_tracks
 from horse_racing_game.domain.rival import RivalProfile
 
 
@@ -72,6 +76,40 @@ class ChampionshipTests(unittest.TestCase):
 
         self.assertEqual(assignments["golden_switch"], "stormforge")
         self.assertEqual(assignments["river_chime"], "heatherbank")
+
+    def test_custom_tracks_append_playable_career_rounds(self) -> None:
+        root = Path(__file__).parent.parent
+        base_calendar = load_championship_calendar(root / "content" / "championship.json")
+        custom_track = build_custom_track(draft_from_track(load_tracks(root / "content" / "tracks.json")[0]), 1)
+
+        calendar = championship_calendar_with_custom_tracks(base_calendar, (custom_track,))
+
+        self.assertEqual(len(calendar), len(base_calendar) + 1)
+        self.assertEqual(calendar[-1].race_id, "custom_career_custom_audio_track_2")
+        self.assertEqual(calendar[-1].track_id, "custom_audio_track_2")
+        self.assertEqual(calendar[-1].weather_id, "clear")
+        self.assertIn("Local custom track exhibition", calendar[-1].briefing)
+
+    def test_playable_calendar_loads_saved_custom_tracks(self) -> None:
+        source_root = Path(__file__).parent.parent
+        with tempfile.TemporaryDirectory() as directory:
+            project_root = Path(directory)
+            content_root = project_root / "content"
+            content_root.mkdir()
+            (content_root / "championship.json").write_text(
+                (source_root / "content" / "championship.json").read_text(encoding="utf-8"),
+                encoding="utf-8",
+            )
+            (content_root / "tracks.json").write_text(
+                (source_root / "content" / "tracks.json").read_text(encoding="utf-8"),
+                encoding="utf-8",
+            )
+            custom_track = build_custom_track(draft_from_track(load_tracks(source_root / "content" / "tracks.json")[0]), 2)
+            save_custom_track(project_root, custom_track)
+
+            calendar = load_playable_championship_calendar(content_root, project_root)
+
+            self.assertEqual(calendar[-1].track_id, "custom_audio_track_3")
 
     def test_next_championship_race_clamps_negative_progress(self) -> None:
         root = Path(__file__).parent.parent

@@ -18,7 +18,7 @@ Before adding an interactive element:
 
 ## Menu Rows
 
-Source of truth: `PygameMenuState` + `_selection_text` (`ui/menu_models.py`, `ui/pygame_menu.py`). `MENU_ROW_COUNT = 16`. Up/Down move rows; Left/Right cycle a selector; Enter/Space activates. Career mode now opens `ui/pygame_career_hub.py` before launching race/training/rest.
+Source of truth: `PygameMenuState` + `_selection_text` (`ui/menu_models.py`, `ui/pygame_menu.py`). `MENU_ROW_COUNT = 20`. Up/Down move rows; Left/Right cycle a selector; Space activates. Career mode now opens `ui/pygame_career_hub.py` before launching race/training/rest.
 
 ### Selectors (rows 0–5)
 
@@ -60,9 +60,9 @@ Source: key handling in `ui/pygame_game.py`; help string in `audio/voice_feedbac
 | Decrease pace     | Down / S                              | `throttle_delta` −       |
 | Move lane left    | Left / A / Q                          | `lateral_delta` −        |
 | Move lane right   | Right / D                             | `lateral_delta` +        |
-| Push (sprint)     | Space                                 | `push_requested`         |
-| Jump obstacle     | J                                     | `jump_requested`         |
-| Duck obstacle     | K / Ctrl                              | `duck_requested`         |
+| Push (sprint)     | J                                     | `push_requested`         |
+| Jump obstacle     | Space                                 | `jump_requested`         |
+| Duck obstacle     | Left Ctrl / Right Ctrl                | `duck_requested`         |
 | Status            | Tab / Enter                           | `request_status`         |
 | Repeat last line  | R                                     | (voice feedback)         |
 | Open menu         | M                                     | (next_action = menu)     |

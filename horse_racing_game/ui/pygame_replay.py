@@ -5,7 +5,12 @@ import pygame
 
 from horse_racing_game.app.progress import GameProgress
 from horse_racing_game.app.replay import ReplayTimeline, build_replay_timeline, replay_from_dict, replay_line_for_event
-from horse_racing_game.app.replay_exports import build_last_replay_share_bundle, load_replay_share_index, save_replay_share_bundle
+from horse_racing_game.app.replay_exports import (
+    build_last_replay_share_bundle,
+    import_replay_share,
+    load_replay_share_index,
+    save_replay_share_bundle,
+)
 from horse_racing_game.audio.audio_engine import AudioEngine
 from horse_racing_game.audio.event_router import AudioEventRouter
 from horse_racing_game.audio.pygame_backend import PygameAudioBackend
@@ -32,6 +37,8 @@ class PygameReplayScreen:
         self._playing = self._timeline.has_events
         self._time_until_next_s = 0.0
         self._status = "Audio replay ready" if self._timeline.has_events else self._lines[0]
+        self._share_index = load_replay_share_index(self._project_root)
+        self._share_index_position = 0
         self._share_status = self._initial_share_status()
 
     def run(self) -> None:
@@ -66,7 +73,7 @@ class PygameReplayScreen:
         pygame.quit()
 
     def _handle_key(self, key: int) -> bool:
-        if key in {pygame.K_ESCAPE, pygame.K_m, pygame.K_q}:
+        if key in {pygame.K_ESCAPE, pygame.K_m}:
             return False
         if key == pygame.K_SPACE:
             self._playing = not self._playing
@@ -92,6 +99,12 @@ class PygameReplayScreen:
         elif key == pygame.K_s:
             self._playing = False
             self._export_share()
+        elif key == pygame.K_TAB:
+            self._playing = False
+            self._cycle_share(1)
+        elif key == pygame.K_i:
+            self._playing = False
+            self._import_selected_share()
         return True
 
     def _update(self, delta_s: float) -> None:
@@ -143,16 +156,73 @@ class PygameReplayScreen:
             self._audio.speak(self._share_status, 80)
             return
         result = save_replay_share_bundle(self._project_root, bundle)
-        self._share_status = f"Exported {len(result.files)} files to {result.directory}."
+        self._refresh_share_index()
+        self._share_status = f"Exported {len(result.files)} files to {result.directory}. {self._selected_share_text()}"
         self._status = "Replay share exported"
         self._audio.speak("Replay share exported.", 90)
 
     def _initial_share_status(self) -> str:
-        share_count = len(load_replay_share_index(self._project_root))
-        suffix = f" {share_count} saved share(s)." if share_count else ""
+        suffix = f" {len(self._share_index)} saved share(s). {self._selected_share_text()}" if self._share_index else ""
         if self._timeline.has_events:
-            return f"Press S to export replay share files.{suffix}"
-        return f"No replay share is available.{suffix}"
+            return f"Press S to export replay share files. Press I to import selected share.{suffix}"
+        return f"No replay is loaded. Press I to import selected share.{suffix}"
+
+    def _refresh_share_index(self) -> None:
+        self._share_index = load_replay_share_index(self._project_root)
+        if self._share_index:
+            self._share_index_position = min(self._share_index_position, len(self._share_index) - 1)
+        else:
+            self._share_index_position = 0
+
+    def _selected_share(self):
+        if not self._share_index:
+            return None
+        return self._share_index[self._share_index_position]
+
+    def _selected_share_text(self) -> str:
+        selected = self._selected_share()
+        if selected is None:
+            return "No saved shares."
+        rank = "unranked" if selected.final_rank is None else f"rank {selected.final_rank}"
+        return (
+            f"Selected share {self._share_index_position + 1}/{len(self._share_index)}: "
+            f"{selected.title}, {selected.track_id}, {rank}, {selected.duration_s:.1f}s."
+        )
+
+    def _cycle_share(self, delta: int) -> None:
+        self._refresh_share_index()
+        if not self._share_index:
+            self._share_status = "No saved replay shares."
+            self._audio.speak(self._share_status, 80)
+            return
+        self._share_index_position = (self._share_index_position + delta) % len(self._share_index)
+        self._share_status = self._selected_share_text()
+        self._audio.speak(self._share_status, 80)
+
+    def _import_selected_share(self) -> None:
+        self._refresh_share_index()
+        selected = self._selected_share()
+        if selected is None:
+            self._share_status = "No saved replay shares to import."
+            self._status = "No replay share selected"
+            self._audio.speak(self._share_status, 80)
+            return
+        imported = import_replay_share(self._project_root, self._content_root, selected.replay_id, self._progress)
+        if imported is None:
+            self._share_status = f"Could not import replay share {selected.replay_id}."
+            self._status = "Replay share import failed"
+            self._audio.speak(self._share_status, 80)
+            return
+        self._progress = imported.progress
+        self._lines = imported.replay_lines
+        replay = replay_from_dict(self._progress.last_replay or {})
+        self._timeline = build_replay_timeline(replay, self._content_root) if replay is not None else ReplayTimeline((), (), None)
+        self._index = 0
+        self._last_key_index = None
+        self._playing = self._timeline.has_events
+        self._share_status = f"Imported {imported.title}. {self._selected_share_text()}"
+        self._status = "Replay share imported"
+        self._audio.speak(f"Imported {imported.title}.", 90)
 
     def _draw(
         self,
@@ -163,7 +233,7 @@ class PygameReplayScreen:
     ) -> None:
         screen.fill((18, 24, 30))
         screen.blit(title_font.render("Audio Replay", True, (248, 240, 205)), (58, 42))
-        hint = "Space pause/play | Right step | Left back | F final stretch | R key moment | S share | M/Esc menu"
+        hint = "Space pause/play | Right/Left step | F final | R key | S export | Tab shares | I import | M/Esc"
         screen.blit(small_font.render(hint, True, (245, 220, 130)), (62, 92))
         panel = pygame.Rect(58, 132, 860, 420)
         pygame.draw.rect(screen, (31, 40, 48), panel, border_radius=6)

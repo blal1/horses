@@ -1,11 +1,18 @@
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 
 from horse_racing_game.app.file_directories import FileDirectories
-from horse_racing_game.app.progress import GameProgress
-from horse_racing_game.app.replay import KEY_REPLAY_EVENTS, ReplayTimeline, build_replay_lines, reconstruct_race, replay_from_dict
+from horse_racing_game.app.progress import GameProgress, save_progress
+from horse_racing_game.app.replay import (
+    KEY_REPLAY_EVENTS,
+    ReplayTimeline,
+    build_replay_lines,
+    reconstruct_race,
+    replay_from_dict,
+    replay_to_dict,
+)
 from horse_racing_game.app.replay_sharing import (
     CommandLogShare,
     HighlightClip,
@@ -48,6 +55,14 @@ class ReplayShareIndexEntry:
     duration_s: float
     final_rank: int | None
     files: tuple[Path, ...]
+
+
+@dataclass(frozen=True)
+class ReplayShareImportResult:
+    replay_id: str
+    title: str
+    progress: GameProgress
+    replay_lines: tuple[str, ...]
 
 
 def replay_share_directory(project_root: Path) -> Path:
@@ -123,6 +138,42 @@ def load_replay_share_index(project_root: Path) -> tuple[ReplayShareIndexEntry, 
         if entry is not None:
             entries.append(entry)
     return tuple(sorted(entries, key=lambda item: (-item.duration_s, item.replay_id)))
+
+
+def import_replay_share(
+    project_root: Path,
+    content_root: Path,
+    replay_id: str,
+    progress: GameProgress,
+) -> ReplayShareImportResult | None:
+    entry = next((item for item in load_replay_share_index(project_root) if item.replay_id == replay_id), None)
+    if entry is None:
+        return None
+    command_path = next((path for path in entry.files if path.name == f"{entry.replay_id}-command-log.json"), None)
+    if command_path is None:
+        return None
+    command_log = load_json_object(command_path)
+    if command_log is None:
+        return None
+    replay = replay_from_dict(command_log.get("payload"))
+    if replay is None:
+        return None
+    try:
+        reconstructed = reconstruct_race(replay, content_root)
+    except (OSError, ValueError):
+        return None
+    lines = build_replay_lines(reconstructed.state, reconstructed.events)
+    imported = replace(
+        progress,
+        last_horse_id=replay.player_horse_id,
+        last_track_id=replay.track_id,
+        last_weather_id=replay.weather_id,
+        last_stable_id=replay.stable_id,
+        last_replay_lines=lines,
+        last_replay=replay_to_dict(replay),
+    )
+    save_progress(project_root, imported)
+    return ReplayShareImportResult(entry.replay_id, entry.title, imported, lines)
 
 
 def _load_replay_share_manifest(directory: Path, manifest_path: Path) -> ReplayShareIndexEntry | None:

@@ -956,9 +956,9 @@ def _career_cap(project_root: Path) -> int:
     """Data-driven cap for career progress: the championship calendar length when
     available, else the default. Used to sanitize stored values on load."""
     try:
-        from horse_racing_game.app.championship import load_championship_calendar
+        from horse_racing_game.app.championship import load_playable_championship_calendar
 
-        calendar = load_championship_calendar(project_root / "content" / "championship.json")
+        calendar = load_playable_championship_calendar(project_root / "content", project_root)
     except (OSError, ValueError):
         return CAREER_LENGTH
     return len(calendar) if calendar else CAREER_LENGTH

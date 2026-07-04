@@ -34,7 +34,7 @@ UI_FRAME_RATE = 60
 VISIBLE_OBSTACLE_DISTANCE_M = 260.0
 RACE_MUSIC = "assets/downloads/musicword-horsemen-242175.mp3"
 TUTORIAL_MESSAGES = (
-    (0.0, "Tutorial started. Use up and down arrows, W and S, or Z and S, to change pace."),
+    (0.0, "Tutorial started. Use up and down arrows, or Z and S, to change pace."),
     (4.0, "Pacing by ear matters. Cruising means efficient speed; overpushing means ease off before stamina collapses."),
     (8.0, "Stamina is heard in breathing. Heavy breath means ease off until recovery cues settle, then build pace again."),
     (12.0, "Rivals are spatial. A rival louder in the left ear is on your left; right ear means right side."),
@@ -42,10 +42,10 @@ TUTORIAL_MESSAGES = (
     (20.0, "At the turn apex, small steering taps are safer than holding hard into the rail."),
     (24.0, "Obstacle radar pings get faster as hazards approach. The warning names the lane and required action."),
     (28.0, "For dodge obstacles, change lanes early and listen for the near miss or clean pass confirmation."),
-    (32.0, "For jump timing, press J when the obstacle warning is close, then listen for takeoff and confirmation."),
-    (36.0, "For duck timing, press K or Control on low branches, banners, gates, or ropes."),
+    (32.0, "For jump timing, press Space when the obstacle warning is close, then listen for takeoff and confirmation."),
+    (36.0, "For duck timing, press Control on low branches, banners, gates, or ropes."),
     (40.0, "Final stretch has a crowd rise. Save a push for that cue instead of spending all stamina early."),
-    (44.0, "Press Tab or Enter any time to hear rank, distance, stamina, and weather."),
+    (44.0, "Press Tab any time to hear rank, distance, stamina, and weather."),
     (48.0, "Replay controls use pause, step, final stretch, and key moment jumps to review the race by audio."),
     (52.0, "On mobile, drag for pace and steering, swipe up to jump, swipe down to duck, and long press for status."),
     (56.0, "M returns to the menu. N restarts. Escape quits."),
@@ -283,17 +283,17 @@ class PygameRaceGame:
             self._last_input_text = self._input_text(keys)
             return RaceCommand(
                 throttle_delta=self._axis(
-                    self._any_key_down(keys, pygame.K_UP, pygame.K_w, pygame.K_z),
+                    self._any_key_down(keys, pygame.K_UP, pygame.K_z),
                     self._any_key_down(keys, pygame.K_DOWN, pygame.K_s),
                 ),
                 lateral_delta=self._axis(
                     self._any_key_down(keys, pygame.K_RIGHT, pygame.K_d),
-                    self._any_key_down(keys, pygame.K_LEFT, pygame.K_a, pygame.K_q),
+                    self._any_key_down(keys, pygame.K_LEFT, pygame.K_q),
                 ),
-                push_requested=self._any_key_down(keys, pygame.K_SPACE),
-                jump_requested=self._any_key_down(keys, pygame.K_j) or self._jump_buffer_s > 0.0,
-                duck_requested=self._any_key_down(keys, pygame.K_k, pygame.K_LCTRL, pygame.K_RCTRL) or self._duck_buffer_s > 0.0,
-                request_status=self._any_key_down(keys, pygame.K_TAB, pygame.K_RETURN),
+                push_requested=self._any_key_down(keys, pygame.K_j),
+                jump_requested=self._any_key_down(keys, pygame.K_SPACE) or self._jump_buffer_s > 0.0,
+                duck_requested=self._any_key_down(keys, pygame.K_LCTRL, pygame.K_RCTRL) or self._duck_buffer_s > 0.0,
+                request_status=self._any_key_down(keys, pygame.K_TAB),
             )
         self._last_input_text = input_state.describe()
         command = input_state.command()
@@ -317,17 +317,17 @@ class PygameRaceGame:
             return False, "menu"
         if key == pygame.K_n:
             return False, "restart"
-        if key == pygame.K_SPACE:
-            self._play_action_sound("horse_push_surge", 0.64)
         if key == pygame.K_j:
+            self._play_action_sound("horse_push_surge", 0.64)
+        if key == pygame.K_SPACE:
             self._jump_buffer_s = 0.35
             self._play_action_sound("horse_jump_takeoff", 0.62)
-        if key in {pygame.K_k, pygame.K_LCTRL, pygame.K_RCTRL}:
+        if key in {pygame.K_LCTRL, pygame.K_RCTRL}:
             self._duck_buffer_s = 0.35
             self._play_action_sound("horse_lane_change_hoof_sweep", 0.46)
         if key == pygame.K_p:
             self._paused = not self._paused
-        elif key == pygame.K_h or key == pygame.K_F1:
+        elif key == pygame.K_F1:
             self._show_help = not self._show_help
             self._services.audio_backend.speak(HELP_TEXT, 90)
             self._messages.appendleft(HELP_TEXT)
@@ -563,7 +563,7 @@ class PygameRaceGame:
         self._draw_text(
             screen,
             fonts.body,
-            "Arrows/ZQSD/WASD control horse | Space push | J jump | K/Ctrl duck | Tab/Enter status | R repeat | M menu | Esc quit",
+            "Arrows/ZQSD control horse | J push | Space jump | Ctrl duck | Tab status | R repeat | M menu | Esc quit",
             (help_rect.left + 18, help_rect.top + 25),
             (245, 220, 130),
         )
@@ -617,21 +617,21 @@ class PygameRaceGame:
 
     def _input_text(self, keys) -> str:
         active: list[str] = []
-        if self._any_key_down(keys, pygame.K_UP, pygame.K_w, pygame.K_z):
+        if self._any_key_down(keys, pygame.K_UP, pygame.K_z):
             active.append("up")
         if self._any_key_down(keys, pygame.K_DOWN, pygame.K_s):
             active.append("down")
-        if self._any_key_down(keys, pygame.K_LEFT, pygame.K_a, pygame.K_q):
+        if self._any_key_down(keys, pygame.K_LEFT, pygame.K_q):
             active.append("left")
         if self._any_key_down(keys, pygame.K_RIGHT, pygame.K_d):
             active.append("right")
-        if self._any_key_down(keys, pygame.K_SPACE):
+        if self._any_key_down(keys, pygame.K_j):
             active.append("push")
-        if self._any_key_down(keys, pygame.K_j) or self._jump_buffer_s > 0.0:
+        if self._any_key_down(keys, pygame.K_SPACE) or self._jump_buffer_s > 0.0:
             active.append("jump")
-        if self._any_key_down(keys, pygame.K_k, pygame.K_LCTRL, pygame.K_RCTRL) or self._duck_buffer_s > 0.0:
+        if self._any_key_down(keys, pygame.K_LCTRL, pygame.K_RCTRL) or self._duck_buffer_s > 0.0:
             active.append("duck")
-        if self._any_key_down(keys, pygame.K_TAB, pygame.K_RETURN):
+        if self._any_key_down(keys, pygame.K_TAB):
             active.append("status")
         if not active:
             return "No input"
@@ -680,7 +680,6 @@ def build_pygame_services(config: AppConfig) -> GameServices:
     catalog_services = build_quick_race_services(config)
     audio_backend = PygameAudioBackend(config.content_root.parent, catalog_services.sound_catalog)
     return build_quick_race_services(config, audio_backend)
-
 
 
 

@@ -15,7 +15,10 @@ from horse_racing_game.app.profile import load_player_profile
 from horse_racing_game.app.replay import build_replay, replay_to_dict
 from horse_racing_game.app.config import AppConfig
 from horse_racing_game.app.network import InMemoryLockstepTransport
+from horse_racing_game.app.track_ecosystem import load_track_catalog
+from horse_racing_game.app.track_editor import build_custom_track, draft_from_track, save_custom_track
 from horse_racing_game.input.commands import RaceCommand
+from horse_racing_game.content.loaders import load_tracks
 from horse_racing_game.ui.menu_models import MenuSelection
 from horse_racing_game.ui.pygame_career_hub import PygameCareerHubScreen
 from horse_racing_game.ui.pygame_career_result import PygameCareerResultScreen
@@ -87,6 +90,12 @@ class PygameSecondaryScreenTests(unittest.TestCase):
                 GameProgress(last_replay=replay, last_replay_lines=("Replay line one.",)),
             )
             self.assertIn("1 saved share", refreshed._share_status)
+
+            importer = PygameReplayScreen(self.root / "content", project_root, GameProgress())
+            self.assertTrue(importer._handle_key(pygame.K_i))
+            self.assertIn("Imported Last Race Replay", importer._share_status)
+            self.assertTrue(importer._timeline.has_events)
+            self.assertEqual(load_progress(project_root).last_replay["track_id"], "ashford_oval")
 
     def test_online_lobby_local_host_join_and_draw(self) -> None:
         host_calls: list[tuple[str, int, object | None, float]] = []
@@ -240,6 +249,31 @@ class PygameSecondaryScreenTests(unittest.TestCase):
 
         self.assertEqual(screen._next_race_line(), "Next championship race: complete")
 
+    def test_stats_and_career_hub_include_saved_custom_track_round(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            project_root = Path(directory)
+            content_root = project_root / "content"
+            content_root.mkdir()
+            for name in ("championship.json", "tracks.json", "stables.json", "sound_manifest.json", "elevenlabs_audio_prompts.json"):
+                source = self.root / "content" / name
+                if source.exists():
+                    (content_root / name).write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+            custom_track = build_custom_track(draft_from_track(load_tracks(self.root / "content" / "tracks.json")[0]), 1)
+            save_custom_track(project_root, custom_track)
+            progress = GameProgress(career_races_completed=9)
+
+            stats = PygameStatsScreen(content_root, project_root, progress)
+            hub = PygameCareerHubScreen(
+                content_root,
+                project_root,
+                progress,
+                MenuSelection("ember_stride", "ashford_oval", stable_id="oak_lane", difficulty_id="pro", mode="career"),
+            )
+
+            self.assertIn("10", stats._stats_lines()[2])
+            self.assertIn("custom_audio_track_2", stats._next_race_line())
+            self.assertTrue(any("Custom Career: Custom Audio Track 2" in line for line in hub._season_lines()))
+
     def test_interactive_screens_repeat_on_r_without_leaving(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             project_root = Path(directory)
@@ -332,26 +366,26 @@ class PygameSecondaryScreenTests(unittest.TestCase):
         self.assertIn("Current contract pays 110", screen._selection_text())
         self.assertIn("Staff upkeep will deduct 0", screen._selection_text())
         self.assertIn("injury risk 19 percent", screen._selection_text())
-        self.assertIsNotNone(screen._handle_keydown(pygame.K_RETURN))
+        self.assertIsNotNone(screen._handle_keydown(pygame.K_SPACE))
         screen._selected_row = 1
         self.assertIn("Stable training bonus", screen._selection_text())
-        self.assertIsNotNone(screen._handle_keydown(pygame.K_RETURN))
+        self.assertIsNotNone(screen._handle_keydown(pygame.K_SPACE))
         screen._selected_row = 2
         self.assertIn("Recover 1 energy", screen._selection_text())
-        self.assertIsNotNone(screen._handle_keydown(pygame.K_RETURN))
+        self.assertIsNotNone(screen._handle_keydown(pygame.K_SPACE))
         screen._progress = GameProgress(career_energy=0)
         screen._selected_row = 1
-        self.assertIsNone(screen._handle_keydown(pygame.K_RETURN))
+        self.assertIsNone(screen._handle_keydown(pygame.K_SPACE))
         screen._progress = GameProgress(career_energy=2, career_injury_days=1)
         screen._selected_row = 0
-        self.assertIsNone(screen._handle_keydown(pygame.K_RETURN))
+        self.assertIsNone(screen._handle_keydown(pygame.K_SPACE))
         screen._selected_row = 1
-        self.assertIsNone(screen._handle_keydown(pygame.K_RETURN))
+        self.assertIsNone(screen._handle_keydown(pygame.K_SPACE))
         screen._progress = GameProgress(career_energy=3)
         screen._selected_row = 2
-        self.assertIsNone(screen._handle_keydown(pygame.K_RETURN))
+        self.assertIsNone(screen._handle_keydown(pygame.K_SPACE))
         screen._selected_row = 9
-        self.assertIsNotNone(screen._handle_keydown(pygame.K_RETURN))
+        self.assertIsNotNone(screen._handle_keydown(pygame.K_SPACE))
         screen._draw(surface, *self.fonts)
 
         self.assertNotEqual(surface.get_at((60, 44))[:3], (0, 0, 0))
@@ -374,11 +408,11 @@ class PygameSecondaryScreenTests(unittest.TestCase):
             )
 
             screen._selected_row = 4
-            self.assertIsNone(screen._handle_keydown(pygame.K_RETURN))
+            self.assertIsNone(screen._handle_keydown(pygame.K_SPACE))
             screen._selected_row = 6
-            self.assertIsNone(screen._handle_keydown(pygame.K_RETURN))
+            self.assertIsNone(screen._handle_keydown(pygame.K_SPACE))
             screen._selected_row = 8
-            self.assertIsNone(screen._handle_keydown(pygame.K_RETURN))
+            self.assertIsNone(screen._handle_keydown(pygame.K_SPACE))
             saved = load_progress(project_root)
 
             self.assertEqual(saved.active_career_contract_id, "regional_backer")
@@ -413,19 +447,19 @@ class PygameSecondaryScreenTests(unittest.TestCase):
 
             self.assertEqual(screen._selected_upgrade().upgrade_id, "training_ring_1")
             screen._selected_row = 5
-            self.assertIsNone(screen._handle_keydown(pygame.K_RETURN))
+            self.assertIsNone(screen._handle_keydown(pygame.K_SPACE))
             self.assertEqual(screen._selected_upgrade().upgrade_id, "recovery_clinic_1")
             self.assertIn("recovery_clinic_1", screen._selection_text())
             screen._selected_row = 6
-            self.assertIsNone(screen._handle_keydown(pygame.K_RETURN))
+            self.assertIsNone(screen._handle_keydown(pygame.K_SPACE))
 
             self.assertEqual(screen._selected_staff_member().staff_id, "assistant_trainer")
             screen._selected_row = 7
-            self.assertIsNone(screen._handle_keydown(pygame.K_RETURN))
+            self.assertIsNone(screen._handle_keydown(pygame.K_SPACE))
             self.assertEqual(screen._selected_staff_member().staff_id, "stable_vet")
             self.assertIn("stable_vet", screen._selection_text())
             screen._selected_row = 8
-            self.assertIsNone(screen._handle_keydown(pygame.K_RETURN))
+            self.assertIsNone(screen._handle_keydown(pygame.K_SPACE))
 
             saved = load_progress(project_root)
             self.assertEqual(saved.stable_upgrade_ids, ("recovery_clinic_1",))
@@ -453,18 +487,18 @@ class PygameSecondaryScreenTests(unittest.TestCase):
 
             self.assertEqual(screen._selected_contract().contract_id, "regional_backer")
             screen._selected_row = 3
-            self.assertIsNone(screen._handle_keydown(pygame.K_RETURN))
+            self.assertIsNone(screen._handle_keydown(pygame.K_SPACE))
             self.assertEqual(screen._selected_contract().contract_id, "elite_syndicate")
             self.assertIn("locked, reputation 28 required", screen._selection_text())
             screen._selected_row = 4
-            self.assertIsNone(screen._handle_keydown(pygame.K_RETURN))
+            self.assertIsNone(screen._handle_keydown(pygame.K_SPACE))
             self.assertIsNone(load_progress(project_root).active_career_contract_id)
             screen._selected_row = 3
-            self.assertIsNone(screen._handle_keydown(pygame.K_RETURN))
+            self.assertIsNone(screen._handle_keydown(pygame.K_SPACE))
             self.assertEqual(screen._selected_contract().contract_id, "rookie_sponsor")
             self.assertIn("Rookie Feed Co.", screen._selection_text())
             screen._selected_row = 4
-            self.assertIsNone(screen._handle_keydown(pygame.K_RETURN))
+            self.assertIsNone(screen._handle_keydown(pygame.K_SPACE))
 
             self.assertEqual(load_progress(project_root).active_career_contract_id, "rookie_sponsor")
 
@@ -498,8 +532,8 @@ class PygameSecondaryScreenTests(unittest.TestCase):
             screen._draw(surface, *self.fonts)
             self.assertNotEqual(surface.get_at((60, 44))[:3], (0, 0, 0))
 
-            # Enter chooses the current challenge and closes the screen
-            self.assertFalse(screen._handle_key(pygame.K_RETURN))
+            # Space chooses the current challenge and closes the screen
+            self.assertFalse(screen._handle_key(pygame.K_SPACE))
             self.assertEqual(screen.chosen_event_id, "ashford_champion_charge")
 
     def test_special_event_screen_escape_returns_none(self) -> None:
@@ -525,11 +559,41 @@ class PygameSecondaryScreenTests(unittest.TestCase):
             self.assertTrue(screen._handle_key(pygame.K_RIGHT, True))
             self.assertTrue(screen._handle_key(pygame.K_r, True))
             screen._field_index = len(FIELD_NAMES) - 1
-            self.assertFalse(screen._handle_key(pygame.K_RETURN, True))
+            self.assertFalse(screen._handle_key(pygame.K_SPACE, True))
             screen._draw(surface, *self.fonts)
 
             self.assertEqual(screen.saved_track_id, "custom_audio_track")
             self.assertNotEqual(surface.get_at((60, 44))[:3], (0, 0, 0))
+
+    def test_track_editor_publishes_rates_discovers_and_selects_catalog_track(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            project_root = Path(directory)
+            content_root = project_root / "content"
+            content_root.mkdir()
+            for name in ("tracks.json", "sound_manifest.json", "elevenlabs_audio_prompts.json"):
+                source = self.root / "content" / name
+                if source.exists():
+                    (content_root / name).write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+
+            screen = PygameTrackEditorScreen(content_root, project_root, GameProgress())
+
+            screen._field_index = 4
+            self.assertTrue(screen._handle_key(pygame.K_RIGHT, True))
+            self.assertEqual(screen._custom_slot_index, 1)
+            screen._field_index = 5
+            self.assertTrue(screen._handle_key(pygame.K_SPACE, True))
+            screen._field_index = 6
+            self.assertTrue(screen._handle_key(pygame.K_SPACE, True))
+            screen._field_index = 7
+            self.assertTrue(screen._handle_key(pygame.K_SPACE, True))
+            screen._field_index = 8
+            self.assertTrue(screen._handle_key(pygame.K_SPACE, True))
+
+            catalog = load_track_catalog(project_root)
+            self.assertEqual(catalog.shares()[0].track_id, "custom_audio_track_2")
+            self.assertEqual(catalog.average_rating("custom_audio_track_2"), 5.0)
+            self.assertIn("Selected discovered track", screen._catalog_status)
+            self.assertEqual(screen._selected_track_id, "custom_audio_track_2")
 
     def test_track_editor_escape_exits(self) -> None:
         screen = PygameTrackEditorScreen(self.root / "content", self.root, GameProgress())

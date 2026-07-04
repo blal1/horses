@@ -3,13 +3,13 @@ from PyInstaller.utils.hooks import collect_all
 
 import os
 
-# Ship the encrypted resource pack instead of raw content/ when it exists
-# (built by scripts/build_pack.py). Fall back to raw content for dev builds.
-datas = [('assets', 'assets'), ('nvdaControllerClient64.dll', '.'), ('PLAY_GAME.bat', '.')]
+# Ship the encrypted resource pack instead of raw content/assets when it exists
+# (built by scripts/build_pack.py). Fall back to raw folders only for dev builds.
+datas = [('nvdaControllerClient64.dll', '.'), ('PLAY_GAME.bat', '.')]
 if os.path.exists('dist/resources.dat'):
     datas += [('dist/resources.dat', '.')]
 else:
-    datas += [('content', 'content')]
+    datas += [('content', 'content'), ('assets', 'assets')]
 binaries = []
 hiddenimports = []
 tmp_ret = collect_all('pygame')

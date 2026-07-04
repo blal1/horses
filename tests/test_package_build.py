@@ -1,5 +1,6 @@
 import json
 import os
+import importlib.util
 import subprocess
 import tempfile
 import unittest
@@ -45,8 +46,11 @@ from horse_racing_game.app.package_build import (
     distribution_plan,
     evaluate_release_artifacts,
     install_instructions,
+    plaintext_resource_asset_rules,
+    protected_asset_rules,
     release_validation_plan,
     signed_checksum,
+    validate_protected_asset_rules,
     validate_required_assets,
     validate_windows_build_inputs,
     linux_build_plan,
@@ -59,6 +63,14 @@ from horse_racing_game.app.platform_support import PlatformTarget
 
 
 PROJECT_ROOT = Path(__file__).parent.parent
+
+
+def _load_build_release_module():
+    spec = importlib.util.spec_from_file_location("build_release", PROJECT_ROOT / "scripts" / "build_release.py")
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
 
 
 class PackageBuildTests(unittest.TestCase):
@@ -90,9 +102,23 @@ class PackageBuildTests(unittest.TestCase):
         self.assertIn("--windowed", command)
         self.assertIn("--collect-all", command)
         self.assertIn("pygame", command)
-        self.assertIn(f"content{os.pathsep}content", command)
-        self.assertIn(f"assets{os.pathsep}assets", command)
+        self.assertIn(f"dist/resources.dat{os.pathsep}.", command)
+        self.assertNotIn(f"content{os.pathsep}content", command)
+        self.assertNotIn(f"assets{os.pathsep}assets", command)
         self.assertEqual(command[-1], "horse_racing_game/app/pygame_main.py")
+
+    def test_default_asset_rules_are_protected_pack_rules(self) -> None:
+        rules = default_asset_rules()
+
+        self.assertEqual(rules, protected_asset_rules())
+        self.assertEqual(validate_protected_asset_rules(rules), ())
+
+    def test_plaintext_resource_asset_rules_are_rejected_for_protected_release(self) -> None:
+        problems = validate_protected_asset_rules(plaintext_resource_asset_rules())
+
+        self.assertIn("missing encrypted resource pack: dist/resources.dat", problems)
+        self.assertIn("plaintext resource directory included: content", problems)
+        self.assertIn("plaintext resource directory included: assets", problems)
 
     def test_required_assets_match_current_repository(self) -> None:
         missing = validate_required_assets(PROJECT_ROOT, default_asset_rules())
@@ -597,6 +623,59 @@ class PackageBuildTests(unittest.TestCase):
         self.assertEqual(payload["missing_inputs"], [])
         self.assertIn("--add-data", payload["command"])
         self.assertTrue(any("--smoke-race" in command for command in payload["smoke_commands"]))
+
+    def test_hardened_release_audit_rejects_plaintext_resource_dirs(self) -> None:
+        audit_protected_release_tree = _load_build_release_module().audit_protected_release_tree
+
+        with tempfile.TemporaryDirectory() as directory:
+            dist = Path(directory) / "HorseRacingAudioFirst"
+            (dist / "content").mkdir(parents=True)
+            (dist / "content" / "horses.json").write_text("{}", encoding="utf-8")
+            (dist / "assets" / "sfx").mkdir(parents=True)
+            (dist / "assets" / "sfx" / "cue.ogg").write_bytes(b"ogg")
+
+            leaks = audit_protected_release_tree(dist)
+
+            self.assertIn("missing resources.dat", leaks)
+            self.assertIn("content", leaks)
+            self.assertIn("content/horses.json", leaks)
+            self.assertIn("assets", leaks)
+            self.assertIn("assets/sfx/cue.ogg", leaks)
+
+    def test_hardened_release_audit_accepts_pack_only_resources(self) -> None:
+        audit_protected_release_tree = _load_build_release_module().audit_protected_release_tree
+
+        with tempfile.TemporaryDirectory() as directory:
+            dist = Path(directory) / "HorseRacingAudioFirst"
+            dist.mkdir(parents=True)
+            (dist / "resources.dat").write_bytes(b"HRPK")
+
+            self.assertEqual(audit_protected_release_tree(dist), ())
+
+    def test_sensitive_code_audit_rejects_readable_sensitive_sources(self) -> None:
+        module = _load_build_release_module()
+
+        with tempfile.TemporaryDirectory() as directory:
+            dist = Path(directory) / "HorseRacingAudioFirst"
+            source = dist / "horse_racing_game" / "security" / "crypto.py"
+            source.parent.mkdir(parents=True)
+            source.write_text("MASTER_KEY = 'readable'", encoding="utf-8")
+
+            problems = module.audit_sensitive_code_tree(dist, ("horse_racing_game/security/crypto.py",))
+
+            self.assertIn("sensitive source shipped: horse_racing_game/security/crypto.py", problems)
+            self.assertIn("missing native extension for sensitive module: horse_racing_game/security/crypto.py", problems)
+
+    def test_sensitive_code_audit_accepts_native_extension_without_source(self) -> None:
+        module = _load_build_release_module()
+
+        with tempfile.TemporaryDirectory() as directory:
+            dist = Path(directory) / "HorseRacingAudioFirst"
+            native = dist / "horse_racing_game" / "security" / "crypto.cp310-win_amd64.pyd"
+            native.parent.mkdir(parents=True)
+            native.write_bytes(b"native")
+
+            self.assertEqual(module.audit_sensitive_code_tree(dist, ("horse_racing_game/security/crypto.py",)), ())
 
     def test_distribution_folder_paths_are_channel_version_platform_scoped(self) -> None:
         folder = DistributionFolder("beta", "0.5.0")
