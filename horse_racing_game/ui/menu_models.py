@@ -8,7 +8,7 @@ from horse_racing_game.audio.mix_profile import AudioMixProfile
 from horse_racing_game.domain.stable import Stable
 
 
-MENU_ROW_COUNT = 19
+MENU_ROW_COUNT = 20
 
 
 @dataclass(frozen=True)

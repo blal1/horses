@@ -34,7 +34,7 @@ class PygameCareerResultScreen:
                 if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.KEYDOWN:
-                    running = False
+                    running = self._handle_key(event.key)
                 elif event.type == pygame.MOUSEBUTTONUP:
                     running = False
 
@@ -42,6 +42,12 @@ class PygameCareerResultScreen:
             pygame.display.flip()
             clock.tick(60)
         pygame.quit()
+
+    def _handle_key(self, key: int) -> bool:
+        if key == pygame.K_r:
+            self._audio.speak(self._spoken_summary(), 100)
+            return True
+        return False
 
     def _spoken_summary(self) -> str:
         return f"Career result. {career_result_summary_text(self._progress.last_career_result_summary)}"
@@ -58,7 +64,7 @@ class PygameCareerResultScreen:
     ) -> None:
         screen.fill((18, 24, 30))
         screen.blit(title_font.render("Career Result", True, (248, 240, 205)), (58, 42))
-        screen.blit(small_font.render("Press any key or click to continue", True, (245, 220, 130)), (62, 92))
+        screen.blit(small_font.render("R repeats result | any other key or click continues", True, (245, 220, 130)), (62, 92))
 
         panel = pygame.Rect(58, 134, 862, 300)
         pygame.draw.rect(screen, (31, 40, 48), panel, border_radius=6)

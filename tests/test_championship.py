@@ -58,9 +58,11 @@ class ChampionshipTests(unittest.TestCase):
         self.assertEqual(next_championship_race(calendar, 0).track_id, "ashford_oval")
         self.assertEqual(next_championship_race(calendar, 1).weather_id, "windy")
         self.assertEqual(next_championship_race(calendar, 2).track_id, "meadowbrook_mile")
-        self.assertIsNone(next_championship_race(calendar, 6))
+        self.assertEqual(next_championship_race(calendar, 3).track_id, "highcliff_rise")
+        self.assertEqual(next_championship_race(calendar, 5).weather_id, "fog")
+        self.assertIsNone(next_championship_race(calendar, 9))
         self.assertIn("Rookie Cup Opening", championship_title(calendar, 0, 0))
-        self.assertIn("Championship complete", championship_title(calendar, 6, 22))
+        self.assertIn("Championship complete", championship_title(calendar, 9, 22))
 
     def test_championship_rival_stables_merges_calendar_assignments(self) -> None:
         root = Path(__file__).parent.parent

@@ -186,5 +186,54 @@
         "audio_marker": "finish_crowd_front"
       }
     ]
+  },
+  {
+    "track_id": "highcliff_rise",
+    "name": "Highcliff Rise",
+    "length_m": 1480.0,
+    "surface": "turf",
+    "lanes": 8,
+    "handedness": "left",
+    "final_stretch_start_m": 1100.0,
+    "audio_profile": {
+      "crowd_loop": "mixkit_crowd_424",
+      "wind_loop": "mixkit_wind_2608",
+      "rain_loop": "mixkit_rain_2393",
+      "countdown": "mixkit_countdown_916"
+    },
+    "segments": [
+      {
+        "start_m": 0.0,
+        "end_m": 320.0,
+        "curve_direction": "none",
+        "curve_intensity": 0.0,
+        "slope": 0.0,
+        "audio_marker": "highcliff_start_gate"
+      },
+      {
+        "start_m": 320.0,
+        "end_m": 700.0,
+        "curve_direction": "left",
+        "curve_intensity": 0.62,
+        "slope": 0.02,
+        "audio_marker": "highcliff_hill_climb"
+      },
+      {
+        "start_m": 700.0,
+        "end_m": 1100.0,
+        "curve_direction": "none",
+        "curve_intensity": 0.0,
+        "slope": -0.014,
+        "audio_marker": "highcliff_descent"
+      },
+      {
+        "start_m": 1100.0,
+        "end_m": 1480.0,
+        "curve_direction": "left",
+        "curve_intensity": 0.42,
+        "slope": 0.006,
+        "audio_marker": "finish_crowd_front"
+      }
+    ]
   }
 ]

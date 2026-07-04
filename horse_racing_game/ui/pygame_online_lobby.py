@@ -128,6 +128,9 @@ class PygameOnlineLobbyScreen:
             return self._edit_host(event)
         if self._editing_port:
             return self._edit_port(event)
+        if key == pygame.K_r:
+            self._speak_row()
+            return None
         if key in {pygame.K_UP, pygame.K_w}:
             self._selected_row = (self._selected_row - 1) % LOBBY_ROWS
             self._speak_row()
@@ -288,7 +291,7 @@ class PygameOnlineLobbyScreen:
     ) -> None:
         screen.fill((18, 24, 30))
         screen.blit(title_font.render("Multiplayer Lobby", True, (248, 240, 205)), (58, 42))
-        screen.blit(small_font.render("Enter selects | Host waits | Join connects | M/Esc returns", True, (245, 220, 130)), (62, 92))
+        screen.blit(small_font.render("Enter selects | Host waits | Join connects | R repeat | M/Esc returns", True, (245, 220, 130)), (62, 92))
         panel = pygame.Rect(58, 132, 860, 398)
         pygame.draw.rect(screen, (31, 40, 48), panel, border_radius=6)
         pygame.draw.rect(screen, (84, 102, 116), panel, width=2, border_radius=6)

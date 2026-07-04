@@ -23,6 +23,12 @@ def career_result_summary_lines(summary: dict | None) -> tuple[str, ...]:
         f"Condition: fatigue {fatigue_before} to {fatigue_after} | injury days {injury_days}.",
         f"Rewards balance: {rewards_balance}.",
     ]
+    difficulty_tier = summary.get("difficulty_tier")
+    reward_multiplier = summary.get("reward_multiplier")
+    if difficulty_tier and reward_multiplier not in (None, 1.0):
+        lines.append(
+            f"Difficulty bonus: {difficulty_tier} tier scaled base reward by {reward_multiplier:.2f}x."
+        )
     if staff_upkeep != 0:
         lines.append(f"Stable consequence: staff upkeep reduced race earnings by {staff_upkeep}.")
     elif contract_reward != 0:

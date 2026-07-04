@@ -159,6 +159,10 @@ def _parse_rival(data: JsonObject, path: Path) -> RivalProfile:
         intro_line=_string(data, "intro_line", path),
         approach_line=_string(data, "approach_line", path),
         passing_line=_string(data, "passing_line", path),
+        racing_style=_string_default(data, "racing_style", path),
+        rivalry_hook=_string_default(data, "rivalry_hook", path),
+        falling_behind_line=_string_default(data, "falling_behind_line", path),
+        blocking_line=_string_default(data, "blocking_line", path),
     )
 
 
@@ -218,6 +222,14 @@ def _optional_string(data: JsonObject, key: str, path: Path) -> str | None:
     if value is None:
         return None
     return _string_value(value, key, path)
+
+
+def _string_default(data: JsonObject, key: str, path: Path, default: str = "") -> str:
+    """Optional string field: returns the default when the key is absent or null,
+    so new content fields stay backward compatible with older data."""
+    if key not in data or data[key] is None:
+        return default
+    return _string_value(data[key], key, path)
 
 
 def _string_value(value: object, label: str, path: Path) -> str:

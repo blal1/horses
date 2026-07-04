@@ -21,19 +21,44 @@ class ContentLoadingTests(unittest.TestCase):
         self.assertEqual(len(horses), 12)
         self.assertEqual(len(rivals), 6)
         self.assertEqual(rivals[0].horse_id, "copper_gate")
-        self.assertEqual(len(tracks), 4)
-        self.assertEqual(tracks[-1].track_id, "meadowbrook_mile")
+        # every rival carries a full identity: style, hook, and all four spoken lines
+        for rival in rivals:
+            self.assertTrue(rival.racing_style, f"{rival.horse_id} missing racing_style")
+            self.assertTrue(rival.rivalry_hook, f"{rival.horse_id} missing rivalry_hook")
+            self.assertTrue(rival.falling_behind_line, f"{rival.horse_id} missing falling_behind_line")
+            self.assertTrue(rival.blocking_line, f"{rival.horse_id} missing blocking_line")
+        self.assertIn("Front-runner", rivals[0].racing_style)
+        self.assertEqual(rivals[0].line_for_event("opponent_blocking_inside"), rivals[0].blocking_line)
+        self.assertEqual(len(tracks), 5)
+        self.assertEqual(tracks[-1].track_id, "highcliff_rise")
         self.assertEqual(len(weather_options), 4)
         self.assertEqual(weather_options[-1].weather_id, "fog")
         self.assertEqual(len(stables), 4)
         self.assertEqual(stables[0].stable_id, "oak_lane")
-        self.assertEqual(len(calendar), 6)
+        self.assertEqual(len(calendar), 9)
         self.assertEqual(calendar[0].race_id, "rookie_cup_opening")
+        self.assertEqual(calendar[-1].race_id, "ashford_final")
         self.assertEqual(calendar[-1].weather_id, "rain")
         self.assertGreaterEqual(len(catalog), 148)
         self.assertIsNotNone(catalog.get("mixkit_horse_85"))
         self.assertIsNotNone(catalog.get("ui_move_soft_tick"))
         self.assertIsNone(catalog.get("music_menu_pastoral_loop"))
+
+    def test_rival_identity_fields_are_optional_and_have_fallbacks(self) -> None:
+        from horse_racing_game.domain.rival import RivalProfile
+
+        bare = RivalProfile("x", "Nomad", "Runs from the front.", "closing", "past")
+        self.assertEqual(bare.racing_style, "")
+        self.assertEqual(bare.narrative_intro(), "Nomad. Runs from the front.")
+        self.assertEqual(bare.line_for_event("opponent_falling_behind"), "")
+
+        full = RivalProfile(
+            "y", "Blaze", "intro", "closing", "past",
+            racing_style="Sprinter", rivalry_hook="Old foe.",
+            falling_behind_line="fading", blocking_line="cuts in",
+        )
+        self.assertEqual(full.narrative_intro(), "Blaze. Sprinter. Old foe.")
+        self.assertEqual(full.line_for_event("opponent_blocking_inside"), "cuts in")
 
     def test_missing_content_file_raises_clear_error(self) -> None:
         with self.assertRaises(FileNotFoundError):

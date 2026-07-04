@@ -79,8 +79,8 @@ Obstacles are loaded per track from `content/obstacles.json`. The `ObstacleContr
 - Deterministic seeded race simulation with curves, slope, surface, weather, stamina
 - Audio-first feedback: spoken status + spatial/positional sound cues + obstacle radar
 - NVDA screen-reader speech on Windows
-- 12 horses (5 player, 7 opponent), 4 tracks, 4 weather types, 4 stables, 6 named rivals
-- Modes: quick race, tutorial, training (5 levels), 3-race career championship, obstacle lab, replay, track editor, stats
+- 12 horses (5 player, 7 opponent), 5 official tracks, 4 weather types, 4 stables, 6 named rivals with racing styles/narrative hooks/spoken lines
+- Modes: quick race, tutorial, training (5 levels), 9-race career championship, time trial, ghost race, special-event scenario challenges, obstacle lab, replay, track editor, stats
 - Stable boosts, training boosts, rival championship standings
 - Persistent progress in `save/progress.json`
 - Configurable audio mix profiles (normal / descriptive / minimal)

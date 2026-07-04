@@ -15,6 +15,7 @@ from horse_racing_game.app.career_depth import (
     career_condition_after_event,
     career_condition_after_rest,
 )
+from horse_racing_game.app.difficulty import difficulty_by_id
 from horse_racing_game.app.file_directories import FileDirectories
 from horse_racing_game.app.savedata import read_secure_object_migrating_plaintext, write_secure_json
 from horse_racing_game.app.stable_management import stable_rest_energy_gain, stable_staff_weekly_cost
@@ -143,6 +144,7 @@ def record_race_result(
     audio_mix_id: str = "normal",
     stable_id: str = "oak_lane",
     difficulty_id: str = "pro",
+    career_difficulty_id: str | None = None,
     replay_lines: tuple[str, ...] = (),
     replay: dict | None = None,
     career_length: int = CAREER_LENGTH,
@@ -170,7 +172,9 @@ def record_race_result(
             "rewards_balance": career_rewards,
         }
     elif finished and is_career and career_races_completed < career_length:
-        base_reward = career_reward_for_rank(rank or 99)
+        reward_tier = difficulty_by_id(career_difficulty_id) if career_difficulty_id else None
+        reward_multiplier = reward_tier.reward_multiplier if reward_tier else 1.0
+        base_reward = max(1, round(career_reward_for_rank(rank or 99) * reward_multiplier))
         contract_reward = 0
         staff_upkeep = 0 if is_training else stable_staff_weekly_cost(progress.stable_staff_ids)
         career_races_completed += 1
@@ -206,6 +210,8 @@ def record_race_result(
             "injury_days": career_injury_days,
             "net_reward": base_reward + contract_reward - paid_upkeep,
             "rewards_balance": career_rewards,
+            "difficulty_tier": reward_tier.name if reward_tier else None,
+            "reward_multiplier": reward_multiplier,
         }
     training_levels = dict(progress.horse_training_levels or {})
     if is_training:

@@ -77,6 +77,7 @@ from horse_racing_game.ui.pygame_menu import PygameMainMenu
 from horse_racing_game.ui.pygame_online_lobby import PygameOnlineLobbyScreen
 from horse_racing_game.ui.pygame_profile import PygameProfileScreen
 from horse_racing_game.ui.pygame_replay import PygameReplayScreen
+from horse_racing_game.ui.pygame_special_events import PygameSpecialEventScreen
 from horse_racing_game.ui.pygame_stats import PygameStatsScreen
 from horse_racing_game.ui.pygame_track_editor import PygameTrackEditorScreen
 
@@ -100,6 +101,8 @@ def main(argv: list[str] | None = None) -> int | None:
         return _smoke_time_trial(project_root)
     if args.smoke_ghost:
         return _smoke_ghost(project_root)
+    if args.smoke_special_event:
+        return _smoke_special_event(project_root)
     if args.smoke_settings:
         return _smoke_settings(project_root)
     if args.smoke_profile:
@@ -126,6 +129,7 @@ def main(argv: list[str] | None = None) -> int | None:
         progress = load_progress(project_root)
         write_runtime_log(project_root, f"pygame_main: content_root={base_config.content_root}")
         write_runtime_log(project_root, f"pygame_main: progress={progress}")
+        _log_cue_coverage(project_root, base_config.content_root)
         while True:
             selection = PygameMainMenu(
                 base_config.content_root,
@@ -155,6 +159,10 @@ def main(argv: list[str] | None = None) -> int | None:
                 continue
             if selection.mode == "profile":
                 PygameProfileScreen(base_config.content_root, project_root).run()
+                progress = load_progress(project_root)
+                continue
+            if selection.mode == "special_event":
+                _run_special_event_mode(base_config, project_root, selection)
                 progress = load_progress(project_root)
                 continue
             if selection.mode in {"career", "career_training", "career_rest"}:
@@ -223,6 +231,7 @@ def main(argv: list[str] | None = None) -> int | None:
                 current_training_level = progress.horse_training_levels.get(selection.player_horse_id, 0) + facility_training_bonus
                 opponent_strength = difficulty_by_id(selection.difficulty_id).opponent_strength
                 career_length = CAREER_LENGTH
+                career_reward_tier_id: str | None = None
                 intro_message = None
                 if is_career:
                     calendar = load_championship_calendar(base_config.content_root / "championship.json")
@@ -231,6 +240,7 @@ def main(argv: list[str] | None = None) -> int | None:
                     intro_message = championship_title(calendar, progress.career_races_completed, progress.career_points)
                     if championship_race is not None:
                         tier = career_difficulty(progress.career_races_completed, len(calendar))
+                        career_reward_tier_id = tier.tier_id
                         opponent_strength = tier.opponent_strength * career_energy_modifier(progress.career_energy)
                         intro_message = f"{intro_message} Difficulty: {tier.name}. Energy: {progress.career_energy}."
                         rival_stable_ids = championship_race.rival_stables
@@ -301,6 +311,7 @@ def main(argv: list[str] | None = None) -> int | None:
                     audio_mix_id=effective_selection.audio_mix_id,
                     stable_id=effective_selection.stable_id,
                     difficulty_id=effective_selection.difficulty_id,
+                    career_difficulty_id=career_reward_tier_id,
                     replay_lines=build_replay_lines(result.state, result.events),
                     replay=replay_to_dict(build_replay(config, result.commands)),
                     career_length=career_length,
@@ -385,6 +396,7 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser.add_argument("--smoke-replay-library", action="store_true", help="Export and rediscover deterministic replay share metadata in a temporary save.")
     parser.add_argument("--smoke-time-trial", action="store_true", help="Run a deterministic headless time-trial save loop.")
     parser.add_argument("--smoke-ghost", action="store_true", help="Run a deterministic headless ghost-race save loop.")
+    parser.add_argument("--smoke-special-event", action="store_true", help="Run each special-event scenario challenge headlessly and score its objectives.")
     parser.add_argument("--smoke-settings", action="store_true", help="Write/read persistent user settings in a temporary save.")
     parser.add_argument("--smoke-profile", action="store_true", help="Write/read persistent profile identity and economy in a temporary save.")
     parser.add_argument("--smoke-track-catalog", action="store_true", help="Write/read persistent track sharing catalog metadata in a temporary save.")
@@ -405,12 +417,26 @@ def _log_integrity_issues(project_root: Path) -> None:
     write_runtime_log(project_root, f"install integrity issues: {summary}")
 
 
+def _log_cue_coverage(project_root: Path, content_root: Path) -> str:
+    """Log which preferred cue sounds the shipped catalog covers so missing
+    audio (which silently falls back at runtime) is visible at startup."""
+    from horse_racing_game.audio.asset_coverage import coverage_report
+    from horse_racing_game.content.loaders import load_sound_catalog
+
+    report = coverage_report(load_sound_catalog(content_root / "sound_manifest.json"))
+    write_runtime_log(project_root, f"cue coverage: {report}")
+    return report
+
+
 def _smoke_content(project_root: Path) -> int:
     config = default_config(project_root)
     services = build_quick_race_services(config)
     if not services.horses or not services.track.track_id or len(services.sound_catalog) == 0:
         return 1
+    from horse_racing_game.audio.asset_coverage import coverage_report
+
     print(f"content ok: track={services.track.track_id} horses={len(services.horses)} sounds={len(services.sound_catalog)}")
+    print(coverage_report(services.sound_catalog))
     return 0
 
 
@@ -580,6 +606,36 @@ def _smoke_ghost(project_root: Path) -> int:
         ok = result.state.is_finished and bool(progress.last_ghost_race_summary)
         print(f"ghost ok: {ok} elapsed={result.state.elapsed_s:.1f} ghost={ghost_time:.1f}")
         return 0 if ok else 1
+
+
+def _smoke_special_event(project_root: Path) -> int:
+    from horse_racing_game.app.special_events import (
+        default_special_events,
+        load_special_event_records,
+        record_special_event_result,
+        run_special_event,
+        special_event_summary,
+    )
+
+    ok = True
+    with tempfile.TemporaryDirectory() as directory:
+        save_root = Path(directory)
+        for challenge in default_special_events():
+            result = run_special_event(project_root, challenge)
+            record = record_special_event_result(save_root, result)
+            if not result.is_finished:
+                ok = False
+            met = len(result.progress.completed_objective_ids)
+            total = len(challenge.objectives)
+            print(
+                f"special event {challenge.event_id}: finished={result.is_finished} "
+                f"rank={result.rank} elapsed={result.elapsed_s:.1f} objectives={met}/{total} "
+                f"best={record.best_objectives_met}/{record.total_objectives} completed={record.completed}"
+            )
+            print("  " + special_event_summary(challenge, result.progress))
+        persisted = load_special_event_records(save_root)
+        ok = ok and len(persisted) == len(default_special_events())
+    return 0 if ok else 1
 
 
 def _smoke_settings(project_root: Path) -> int:
@@ -779,6 +835,43 @@ def _smoke_speech(project_root: Path) -> int:
     ok = isinstance(speaker, NullSpeaker)
     print(f"speech ok: {ok}")
     return 0 if ok else 1
+
+
+def _run_special_event_mode(base_config: AppConfig, project_root: Path, selection: MenuSelection) -> None:
+    """Special-event flow: pick a challenge, race it on the core loop, score and
+    persist the objectives, then return to the challenge list showing the result.
+    """
+    from horse_racing_game.app.special_events import (
+        record_special_event_result,
+        special_event_result_from_state,
+        special_event_summary,
+    )
+
+    last_summary: str | None = None
+    while True:
+        challenge = PygameSpecialEventScreen(base_config.content_root, project_root, last_summary).run()
+        if challenge is None:
+            return
+        effective = MenuSelection(
+            player_horse_id=selection.player_horse_id,
+            track_id=challenge.track_id,
+            weather_id=challenge.weather_id,
+            audio_mix_id=selection.audio_mix_id,
+            stable_id=selection.stable_id,
+            difficulty_id=selection.difficulty_id,
+            mode="special_event",
+        )
+        config = _config_for_selection(base_config, effective)
+        result = PygameRaceGame(
+            config,
+            build_pygame_services(config),
+            project_root,
+            intro_message=f"{challenge.name}. {challenge.briefing}",
+        ).run()
+        event_result = special_event_result_from_state(challenge, result.state)
+        record_special_event_result(project_root, event_result)
+        last_summary = special_event_summary(challenge, event_result.progress)
+        write_runtime_log(project_root, f"pygame_main: special event {challenge.event_id} -> {last_summary}")
 
 
 def _config_for_selection(

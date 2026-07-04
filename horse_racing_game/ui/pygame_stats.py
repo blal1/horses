@@ -42,7 +42,7 @@ class PygameStatsScreen:
                 if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.KEYDOWN:
-                    running = False
+                    running = self._handle_key(event.key)
                 elif event.type == pygame.MOUSEBUTTONUP:
                     running = False
 
@@ -50,6 +50,12 @@ class PygameStatsScreen:
             pygame.display.flip()
             clock.tick(60)
         pygame.quit()
+
+    def _handle_key(self, key: int) -> bool:
+        if key == pygame.K_r:
+            self._audio.speak(self._spoken_summary(), 90)
+            return True
+        return False
 
     def _spoken_summary(self) -> str:
         return f"Statistics. {stats_summary_text(compute_player_stats(self._progress))} Standings. {standings_text(self._standings())}"
@@ -123,7 +129,7 @@ class PygameStatsScreen:
     ) -> None:
         screen.fill((18, 24, 30))
         screen.blit(title_font.render("Statistics", True, (248, 240, 205)), (58, 42))
-        screen.blit(small_font.render("Press any key or click to return to menu", True, (245, 220, 130)), (62, 92))
+        screen.blit(small_font.render("R repeats summary | any other key or click returns to menu", True, (245, 220, 130)), (62, 92))
 
         left = pygame.Rect(58, 132, 410, 430)
         right = pygame.Rect(510, 132, 410, 430)

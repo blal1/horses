@@ -12,7 +12,8 @@ horse_racing_game/
 │   ├── track.py               Track, TrackSegment, Track.segment_at
 │   ├── weather.py             Weather
 │   ├── stable.py              Stable, apply_stable_boost
-│   └── rival.py               RivalProfile
+│   └── rival.py               RivalProfile (+ racing_style, rivalry_hook, falling_behind_line,
+│                              blocking_line; narrative_intro(), line_for_event())
 ├── content/
 │   └── loaders.py             JSON → domain (strict parse); load_horses/tracks/weather/
 │                              rivals/stables/sound_catalog (+ optional ElevenLabs SFX)
@@ -36,7 +37,8 @@ horse_racing_game/
 │   ├── nvda_speaker.py        NvdaSpeaker (Speaker impl; ctypes DLL, graceful failure)
 │   ├── sound_catalog.py       SoundAsset, SoundCatalog (lookup, missing_files)
 │   ├── event_cues.py          SoundCueMap, _CUE_RULES, cue_sound_requirements()
-│   ├── asset_coverage.py      missing_cue_sound_ids / prompt_spec_for_missing (gen-pipeline loop)
+│   ├── asset_coverage.py      missing_cue_sound_ids / coverage_report / prompt_spec_for_missing
+│   │                          (gen-pipeline loop; coverage logged at startup)
 │   ├── event_policy.py        AudioEventPolicy (_EVENT_COOLDOWNS)
 │   ├── event_router.py        AudioEventRouter.route (speak + 2D/3D cue)
 │   ├── audio_engine.py        AudioEngine.render_events (priority sort → policy → route)
@@ -44,21 +46,33 @@ horse_racing_game/
 │   ├── mix_profile.py         AudioMixProfile, MIX_PROFILES, mix_profile_by_id
 │   └── pygame_music.py        play_music / set_music_volume / stop_music
 ├── ui/
-│   ├── menu_models.py         PygameMenuState (16 rows), MenuSelection, MENU_ROW_COUNT
-│   ├── pygame_menu.py         PygameMainMenu.run → MenuSelection|None
-│   ├── pygame_game.py         PygameRaceGame.run (60 Hz loop), build_pygame_services
+│   ├── menu_models.py         PygameMenuState (20 rows), MenuSelection, MENU_ROW_COUNT
+│   ├── pygame_menu.py         PygameMainMenu.run → MenuSelection|None (R repeats selection)
+│   ├── pygame_game.py         PygameRaceGame.run (60 Hz loop); announces rival identity,
+│   │                          speaks per-rival approach/pass/falling-behind/blocking lines
 │   ├── obstacles.py           TrackObstacle, ObstacleController, load_track_obstacles
-│   ├── pygame_stats.py        PygameStatsScreen
+│   ├── pygame_career_hub.py   PygameCareerHubScreen (race/train/rest/contracts/stable; R repeats)
+│   ├── pygame_career_result.py PygameCareerResultScreen (post-race summary; R repeats)
+│   ├── pygame_profile.py      PygameProfileScreen (identity/economy; R repeats)
+│   ├── pygame_online_lobby.py PygameOnlineLobbyScreen (local/host/join; R repeats)
+│   ├── pygame_multiplayer.py  PygameMultiplayerScreen (lockstep duel, chat)
+│   ├── pygame_special_events.py PygameSpecialEventScreen (challenge list + completion badges)
+│   ├── pygame_stats.py        PygameStatsScreen (R repeats summary)
 │   ├── pygame_replay.py       PygameReplayScreen
 │   └── pygame_track_editor.py PygameTrackEditorScreen
+│   Every screen: back/cancel (Esc/Q/M), spoken status, R = repeat, failure feedback.
 └── app/
     ├── pygame_main.py         main(): menu ↔ modes ↔ progress orchestration
     ├── config.py              AppConfig, default_config
     ├── bootstrap.py           GameServices, build_quick_race_services
     ├── game_app.py            GameApp.run_quick_race (headless), QuickRaceResult
-    ├── career.py              points_for_rank, career_title, CAREER_LENGTH=3
-    ├── difficulty.py          DifficultyTier, DIFFICULTY_TIERS, career_difficulty (opponent_strength)
-    ├── championship.py        load_championship_calendar, next_championship_race, standings
+    ├── career.py              points_for_rank, career_reward_for_rank, career_title
+    │                          (CAREER_LENGTH default; real length is data-driven from calendar)
+    ├── difficulty.py          DifficultyTier (opponent_strength + reward_multiplier),
+    │                          DIFFICULTY_TIERS (Rookie/Pro/Elite), career_difficulty
+    ├── championship.py        load_championship_calendar (9-race season), next_championship_race, standings
+    ├── special_events.py      SpecialEventChallenge catalog, evaluate/score objectives,
+    │                          run_special_event, record/load → save/special_events.json
     ├── training.py            training levels 0–5, apply_training_boost
     ├── progress.py            GameProgress, load/record/save → save/progress.json
     ├── replay.py              build_replay_lines; RaceReplay + reconstruct_race (seed+command replay)
@@ -112,7 +126,7 @@ Determinism: `RaceEngine._rng = random.Random(config.seed)` is the only randomne
 
 ### `app/pygame_main.py`
 - **Intent:** Top-level orchestration. `main()`, `_config_for_selection(...)`.
-- Menu → mode dispatch (race/tutorial/training/career/obstacle_lab/replay/track_editor/stats) → `PygameRaceGame.run()` → record progress.
+- Menu → mode dispatch (race/tutorial/training/career→hub/obstacle_lab/time_trial/ghost_race/special_event/replay/track_editor/stats/profile/multiplayer) → `PygameRaceGame.run()` → record progress. `_run_special_event_mode` opens the challenge screen, races the pick, scores/persists it. Logs cue-audio coverage at startup; `--smoke-*` headless entrypoints incl. `--smoke-special-event`.
 
 ### `app/bootstrap.py`
 - `GameServices` dataclass; `build_quick_race_services(config, audio_backend=None)` — load → boost → validate → wire `RaceEngine` + `AudioEngine`.
@@ -124,10 +138,13 @@ Determinism: `RaceEngine._rng = random.Random(config.seed)` is the only randomne
 - `GameProgress` (selections, counts, wins/podiums/best_rank, training levels, rival stats, last_replay_lines); `load_progress`, `record_race_result`, `record_rival_encounter`, `record_rival_championship_result`, `progress_path`.
 
 ### `app/career.py` / `championship.py` / `training.py`
-- `points_for_rank` (10/7/5/3/1), `CAREER_LENGTH=3`, `career_title`; `ChampionshipRace`, `StandingRow`, `next_championship_race`, `championship_title`; `MAX_TRAINING_LEVEL=5`, `apply_training_boost`, `next_training_level`.
+- `points_for_rank` (10/7/5/3/1), `career_reward_for_rank`, `career_title`; career length is data-driven from the 9-race calendar (`_career_cap`), and `record_race_result` scales base rewards by the escalating tier's `reward_multiplier`. `ChampionshipRace`, `StandingRow`, `next_championship_race`, `championship_title`; `MAX_TRAINING_LEVEL=5`, `apply_training_boost`, `next_training_level`.
+
+### `app/special_events.py`
+- `SpecialEventChallenge` (spec + `ScenarioObjective`s), `default_special_events()` (Fog Sprint Gauntlet / Highcliff Endurance Climb / Ashford Champion Charge), `observed_values_for` / `evaluate_special_event` (score a finished `RaceState`), `run_special_event` (drives the core loop), `record_special_event_result` / `load_special_event_records` → `save/special_events.json`.
 
 ### `ui/menu_models.py`
-- `PygameMenuState` (rows 0–4 selectors: horse/track/weather/audio/stable; rows 5–15 actions), `MenuSelection`, `selection(mode)`, `MENU_ROW_COUNT=16`. Career mode opens a dedicated hub with race/training/rest choices.
+- `PygameMenuState` (rows 0–5 selectors: horse/track/weather/audio/stable/difficulty; rows 6–19 actions incl. Special Events at 18, Quit at 19), `MenuSelection`, `selection(mode)`, `MENU_ROW_COUNT=20`. Career mode opens a dedicated hub with race/training/rest choices.
 
 ### `ui/obstacles.py`
 - `TrackObstacle`, `ObstacleController.update(...) -> events`, `RADAR_DISTANCES_M=(120,80,45,25,12)`, actions dodge/jump/duck, 1.25 s hit penalty.

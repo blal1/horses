@@ -123,6 +123,7 @@ class PygameRaceGame:
         state = initial_tick.state
         self._record_events(initial_tick.events, state)
         self._announce_intro()
+        self._announce_rivals(state)
         self._update_tutorial(state.elapsed_s)
 
         running = True
@@ -189,10 +190,17 @@ class PygameRaceGame:
         self._voice_feedback.observe_events(events, state)
         self._append_event_messages(events)
 
+    _RIVAL_LINE_EVENTS = (
+        "opponent_approaching",
+        "opponent_passing",
+        "opponent_falling_behind",
+        "opponent_blocking_inside",
+    )
+
     def _speak_rival_events(self, events: tuple[RaceEvent, ...]) -> None:
         rivals = {rival.horse_id: rival for rival in self._services.rivals}
         for event in events:
-            if event.event_type not in {"opponent_approaching", "opponent_passing"}:
+            if event.event_type not in self._RIVAL_LINE_EVENTS:
                 continue
             rival = rivals.get(event.subject_id or "")
             if rival is None:
@@ -200,8 +208,10 @@ class PygameRaceGame:
             key = (rival.horse_id, event.event_type)
             if key in self._rival_announced:
                 continue
+            line = rival.line_for_event(event.event_type)
+            if not line:
+                continue
             self._rival_announced.add(key)
-            line = rival.passing_line if event.event_type == "opponent_passing" else rival.approach_line
             self._services.audio_backend.speak(line, event.priority + 5)
             self._messages.appendleft(line)
 
@@ -210,6 +220,28 @@ class PygameRaceGame:
             return
         self._services.audio_backend.speak(self._intro_message, 100)
         self._messages.appendleft(self._intro_message)
+
+    def _announce_rivals(self, state) -> None:
+        """Introduce the rivals actually in this race so each has a clear
+        identity before the gates open — spoken once, skipping the player and
+        any opponents without a rival profile."""
+        if self._tutorial_mode or self._training_mode:
+            return
+        rivals = {rival.horse_id: rival for rival in self._services.rivals}
+        opponent_ids = [
+            runner.runner_id for runner in state.runners if not runner.is_player
+        ]
+        for horse_id in opponent_ids:
+            rival = rivals.get(horse_id)
+            if rival is None:
+                continue
+            key = (rival.horse_id, "intro")
+            if key in self._rival_announced:
+                continue
+            self._rival_announced.add(key)
+            line = rival.narrative_intro()
+            self._services.audio_backend.speak(line, 84)
+            self._messages.appendleft(line)
 
     def _play_countdown(self) -> None:
         if self._services.sound_catalog.get("race_countdown_three_beeps") is not None:

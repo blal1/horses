@@ -59,6 +59,9 @@ class PygameProfileScreen:
     def _handle_key(self, key: int) -> bool:
         if key in {pygame.K_ESCAPE, pygame.K_m, pygame.K_q}:
             return False
+        if key == pygame.K_r:
+            self._speak_selection()
+            return True
         if key in {pygame.K_UP, pygame.K_w}:
             self._selected_row = (self._selected_row - 1) % len(self._rows())
             self._speak_selection()
@@ -170,7 +173,7 @@ class PygameProfileScreen:
     ) -> None:
         screen.fill((18, 24, 30))
         screen.blit(title_font.render("Profile", True, (248, 240, 205)), (58, 42))
-        screen.blit(small_font.render("Up/Down row | Left/Right choice | Enter equip/claim | M/Esc menu", True, (245, 220, 130)), (62, 92))
+        screen.blit(small_font.render("Up/Down row | Left/Right choice | Enter equip/claim | R repeat | M/Esc menu", True, (245, 220, 130)), (62, 92))
         left = pygame.Rect(58, 132, 410, 430)
         right = pygame.Rect(510, 132, 410, 430)
         for rect, label in ((left, "Rider"), (right, "Actions")):

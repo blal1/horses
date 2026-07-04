@@ -10,8 +10,11 @@ pipeline.
 - Pygame-based horse racing loop with keyboard and touch input support.
 - Audio-first race feedback, spatial audio cues, speech hooks, and generated
   sound manifests.
-- Quick race, training, replay, career, championship, track editor, and
-  multiplayer prototype modules.
+- Quick race, training, replay, career, 9-race championship, time trial, ghost
+  race, special-event scenario challenges, track editor, and multiplayer
+  prototype modules.
+- Rivals with distinct racing styles, narrative hooks, and per-event spoken
+  lines; every screen supports `R` to repeat the current announcement.
 - Secure save support for progression/profile data.
 - Encrypted resource pack support for release builds.
 - Windows release tooling with Cython compilation for sensitive modules,

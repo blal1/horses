@@ -39,6 +39,19 @@
     }
   },
   {
+    "race_id": "highcliff_ascent",
+    "name": "Highcliff Ascent",
+    "track_id": "highcliff_rise",
+    "weather_id": "windy",
+    "briefing": "The season climbs to Highcliff Rise. Storm Marrow relishes the uphill turn while wind rakes the exposed descent. Pace the climb or pay for it on the run home.",
+    "rival_stables": {
+      "copper_gate": "oak_lane",
+      "river_chime": "heatherbank",
+      "storm_marrow": "ironwood",
+      "golden_switch": "stormforge"
+    }
+  },
+  {
     "race_id": "ironwood_switchback",
     "name": "Ironwood Switchback",
     "track_id": "meadowbrook_mile",
@@ -52,11 +65,37 @@
     }
   },
   {
+    "race_id": "fog_gauntlet",
+    "name": "Fog Gauntlet",
+    "track_id": "bracken_dirt",
+    "weather_id": "fog",
+    "briefing": "Fog swallows Bracken Dirt. Sound leads where sight fails, and Copper Gate presses the blind sprint from Stormforge. Trust the audio cues over instinct.",
+    "rival_stables": {
+      "copper_gate": "stormforge",
+      "river_chime": "heatherbank",
+      "storm_marrow": "ironwood",
+      "golden_switch": "stormforge"
+    }
+  },
+  {
     "race_id": "bracken_showdown",
     "name": "Bracken Showdown",
     "track_id": "bracken_dirt",
     "weather_id": "clear",
     "briefing": "The dirt rematch decides the sprint rivalry. Rest protects energy; career training can create a late-season edge.",
+    "rival_stables": {
+      "copper_gate": "stormforge",
+      "river_chime": "ironwood",
+      "storm_marrow": "ironwood",
+      "golden_switch": "stormforge"
+    }
+  },
+  {
+    "race_id": "highcliff_storm",
+    "name": "Highcliff Storm",
+    "track_id": "highcliff_rise",
+    "weather_id": "rain",
+    "briefing": "Rain turns the Highcliff climb treacherous. Golden Switch and Storm Marrow trade the lead through the streaming final bend. Energy saved earlier decides who holds the hill.",
     "rival_stables": {
       "copper_gate": "stormforge",
       "river_chime": "ironwood",

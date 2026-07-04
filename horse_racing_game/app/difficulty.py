@@ -13,12 +13,15 @@ class DifficultyTier:
     tier_id: str
     name: str
     opponent_strength: float
+    reward_multiplier: float = 1.0
 
 
+# Tougher tiers pay more: an Elite closing race is worth appreciably more than a
+# Rookie opener, so escalating career difficulty also escalates the payoff.
 DIFFICULTY_TIERS = (
-    DifficultyTier("rookie", "Rookie", 0.97),
-    DifficultyTier("pro", "Pro", 1.0),
-    DifficultyTier("elite", "Elite", 1.04),
+    DifficultyTier("rookie", "Rookie", 0.97, reward_multiplier=0.9),
+    DifficultyTier("pro", "Pro", 1.0, reward_multiplier=1.0),
+    DifficultyTier("elite", "Elite", 1.04, reward_multiplier=1.25),
 )
 
 DEFAULT_DIFFICULTY = DIFFICULTY_TIERS[1]

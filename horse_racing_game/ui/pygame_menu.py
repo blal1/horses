@@ -101,6 +101,9 @@ class PygameMainMenu:
             self._play_ui("ui_cancel_low_tap", 0.52, "kenney_close_001")
             self._audio.speak("Quit menu.", 80)
             return _MenuAction.quit()
+        if key == pygame.K_r:
+            self._speak_selection()
+            return _MenuAction.CONTINUE
         if key in {pygame.K_UP, pygame.K_w}:
             self._state.move_row(-1)
             self._play_ui("ui_move_soft_tick", 0.48, "kenney_click_001")
@@ -171,6 +174,10 @@ class PygameMainMenu:
                 self._audio.speak("Showing statistics.", 90)
                 return _MenuAction.start(self._state.selection("stats"))
             elif self._state.selected_row == 18:
+                self._play_confirm()
+                self._audio.speak("Opening special events.", 90)
+                return _MenuAction.start(self._state.selection("special_event"))
+            elif self._state.selected_row == 19:
                 self._play_ui("ui_cancel_low_tap", 0.52, "kenney_close_001")
                 self._audio.speak("Quit.", 80)
                 return _MenuAction.quit()
@@ -233,6 +240,10 @@ class PygameMainMenu:
                     self._play_confirm()
                     self._audio.speak("Showing statistics.", 90)
                     return _MenuAction.start(self._state.selection("stats"))
+                if row_index == 18:
+                    self._play_confirm()
+                    self._audio.speak("Opening special events.", 90)
+                    return _MenuAction.start(self._state.selection("special_event"))
                 self._play_ui("ui_cancel_low_tap", 0.52, "kenney_close_001")
                 self._audio.speak("Quit.", 80)
                 return _MenuAction.quit()
@@ -279,6 +290,8 @@ class PygameMainMenu:
         if self._state.selected_row == 17:
             return "Statistics. Press enter to view season stats and standings."
         if self._state.selected_row == 18:
+            return "Special events. Press enter to open scenario challenges."
+        if self._state.selected_row == 19:
             return "Quit. Press enter to exit."
         return "Quit. Press enter to exit."
 
@@ -295,7 +308,7 @@ class PygameMainMenu:
         self._draw_horse_panel(screen, body_font, small_font)
         self._draw_track_panel(screen, body_font, small_font)
         self._draw_action_hint(screen, body_font, small_font)
-        hint = small_font.render("W/S or Up/Down: row | A/D or Left/Right: change | Enter/Space: activate | Q/Esc: quit", True, (245, 220, 130))
+        hint = small_font.render("W/S or Up/Down: row | A/D or Left/Right: change | Enter/Space: activate | R: repeat | Q/Esc: quit", True, (245, 220, 130))
         screen.blit(hint, (60, 582))
 
     def _draw_header(self, screen: pygame.Surface, title_font: pygame.font.Font, small_font: pygame.font.Font) -> None:
@@ -324,6 +337,7 @@ class PygameMainMenu:
             ("Track Editor", "custom audio track"),
             ("Profile", "identity and wallet"),
             ("Statistics", "stats and standings"),
+            ("Special Events", "scenario challenges"),
             ("Quit", ""),
         )
         for index, row in enumerate(rows):
@@ -415,6 +429,8 @@ class PygameMainMenu:
         elif row == 17:
             text = "Selected: Statistics - Enter/Space shows stats and standings"
         elif row == 18:
+            text = "Selected: Special Events - Enter/Space opens scenario challenges"
+        elif row == 19:
             text = "Selected: Quit - Enter/Space exits"
         else:
             text = "Selected: Quit - Enter/Space exits"

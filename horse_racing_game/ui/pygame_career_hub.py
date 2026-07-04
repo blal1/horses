@@ -109,6 +109,9 @@ class PygameCareerHubScreen:
         if key in {pygame.K_ESCAPE, pygame.K_q, pygame.K_m}:
             self._audio.speak("Back to the menu.", 80)
             return CareerHubResult.back()
+        if key == pygame.K_r:
+            self._speak_selection()
+            return None
         if key in {pygame.K_UP, pygame.K_w}:
             self._selected_row = (self._selected_row - 1) % len(self._rows())
             self._speak_selection()
@@ -305,7 +308,7 @@ class PygameCareerHubScreen:
         screen.fill((18, 24, 30))
         screen.blit(title_font.render("Career Hub", True, (248, 240, 205)), (58, 42))
         screen.blit(
-            small_font.render("Up/Down: choice | Enter/Space: activate | Esc/Q/M: menu", True, (245, 220, 130)),
+            small_font.render("Up/Down: choice | Enter/Space: activate | R: repeat | Esc/Q/M: menu", True, (245, 220, 130)),
             (62, 92),
         )
 

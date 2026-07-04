@@ -11,6 +11,7 @@ from horse_racing_game.app.bootstrap import build_quick_race_services
 from horse_racing_game.app.config import AppConfig
 from horse_racing_game.input.commands import RaceCommand
 from horse_racing_game.simulation.race_events import RaceEvent
+from horse_racing_game.simulation.race_state import RaceState, RunnerState
 from horse_racing_game.ui.pygame_game import PygameRaceGame, TUTORIAL_MESSAGES, _Fonts
 
 
@@ -141,6 +142,75 @@ class PygameSmokeTests(unittest.TestCase):
 
         spoken = [call.text for call in services.audio_backend.calls if call.method == "speak"]
         self.assertEqual(spoken, ["Copper Gate is pressing on your shoulder."])
+
+    def test_rival_falling_behind_and_blocking_events_speak_identity_lines(self) -> None:
+        root = Path(__file__).parent.parent
+        config = AppConfig(content_root=root / "content", tick_hz=60, max_race_seconds=5.0)
+        services = build_quick_race_services(config)
+        game = PygameRaceGame(config, services)
+        events = (
+            RaceEvent(
+                event_type="opponent_falling_behind",
+                priority=45,
+                timestamp_s=1.0,
+                subject_id="copper_gate",
+                data={"forward_m": 4.0, "right_m": 0.2, "horse_name": "Copper Gate"},
+            ),
+            RaceEvent(
+                event_type="opponent_blocking_inside",
+                priority=68,
+                timestamp_s=1.2,
+                subject_id="storm_marrow",
+                data={"forward_m": 0.5, "right_m": -0.4, "horse_name": "Storm Marrow"},
+            ),
+        )
+
+        game._speak_rival_events(events)
+
+        spoken = [call.text for call in services.audio_backend.calls if call.method == "speak"]
+        self.assertIn("Copper Gate is spent early and dropping back.", spoken)
+        self.assertIn("Storm Marrow leans in and pins you to the rail.", spoken)
+
+    def test_announce_rivals_introduces_opponent_identities_once(self) -> None:
+        root = Path(__file__).parent.parent
+        config = AppConfig(content_root=root / "content", tick_hz=60, max_race_seconds=5.0)
+        services = build_quick_race_services(config)
+        game = PygameRaceGame(config, services)
+        rival = next(r for r in services.rivals if r.horse_id == "copper_gate")
+        state = RaceState(
+            elapsed_s=0.0,
+            runners=(
+                RunnerState("player", "You", 0.0, 0.0, 0.0, 100.0, 1.0, True, 1),
+                RunnerState("copper_gate", "Copper Gate", 0.0, 0.1, 0.0, 100.0, 1.0, False, 2),
+            ),
+            is_finished=False,
+        )
+
+        game._announce_rivals(state)
+        game._announce_rivals(state)
+
+        spoken = [call.text for call in services.audio_backend.calls if call.method == "speak"]
+        self.assertEqual(spoken.count(rival.narrative_intro()), 1)
+        self.assertIn("Front-runner", rival.narrative_intro())
+
+    def test_announce_rivals_is_silent_in_training_mode(self) -> None:
+        root = Path(__file__).parent.parent
+        config = AppConfig(content_root=root / "content", tick_hz=60, max_race_seconds=5.0)
+        services = build_quick_race_services(config)
+        game = PygameRaceGame(config, services, training_mode=True)
+        state = RaceState(
+            elapsed_s=0.0,
+            runners=(
+                RunnerState("player", "You", 0.0, 0.0, 0.0, 100.0, 1.0, True, 1),
+                RunnerState("copper_gate", "Copper Gate", 0.0, 0.1, 0.0, 100.0, 1.0, False, 2),
+            ),
+            is_finished=False,
+        )
+
+        game._announce_rivals(state)
+
+        spoken = [call.text for call in services.audio_backend.calls if call.method == "speak"]
+        self.assertEqual(spoken, [])
 
 
 if __name__ == "__main__":

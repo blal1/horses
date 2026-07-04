@@ -48,5 +48,18 @@
       {"obstacle_id": "meadow_banner_1", "distance_m": 1180.0, "lane": 0, "kind": "low_banner", "label": "Low banner", "required_action": "duck"},
       {"obstacle_id": "meadow_cone_2", "distance_m": 1330.0, "lane": 5, "kind": "cone", "label": "Track marker", "required_action": "dodge"}
     ]
+  },
+  {
+    "track_id": "highcliff_rise",
+    "obstacles": [
+      {"obstacle_id": "highcliff_stone_1", "distance_m": 210.0, "lane": 3, "kind": "stone", "label": "Rockfall", "required_action": "jump"},
+      {"obstacle_id": "highcliff_gate_1", "distance_m": 380.0, "lane": 5, "kind": "low_gate", "label": "Timber gate", "required_action": "duck"},
+      {"obstacle_id": "highcliff_barrel_1", "distance_m": 560.0, "lane": 1, "kind": "barrel", "label": "Rolling barrel", "required_action": "dodge"},
+      {"obstacle_id": "highcliff_stone_2", "distance_m": 720.0, "lane": 4, "kind": "stone", "label": "Loose scree", "required_action": "jump"},
+      {"obstacle_id": "highcliff_rope_1", "distance_m": 860.0, "lane": 2, "kind": "low_rope", "label": "Warning rope", "required_action": "duck"},
+      {"obstacle_id": "highcliff_puddle_1", "distance_m": 980.0, "lane": 6, "kind": "puddle", "label": "Spring seep", "required_action": "jump"},
+      {"obstacle_id": "highcliff_rail_1", "distance_m": 1160.0, "lane": 0, "kind": "rail", "label": "Cliff rail", "required_action": "jump"},
+      {"obstacle_id": "highcliff_branch_1", "distance_m": 1320.0, "lane": 3, "kind": "low_branch", "label": "Overhang", "required_action": "duck"}
+    ]
   }
 ]

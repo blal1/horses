@@ -57,7 +57,7 @@ class KeyboardControlStateTests(unittest.TestCase):
 
 class MenuModelTests(unittest.TestCase):
     def test_menu_includes_profile_time_trial_ghost_and_multiplayer_rows(self) -> None:
-        self.assertEqual(MENU_ROW_COUNT, 19)
+        self.assertEqual(MENU_ROW_COUNT, 20)
 
 
 if __name__ == "__main__":

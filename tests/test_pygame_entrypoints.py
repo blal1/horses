@@ -32,6 +32,27 @@ class PygameEntrypointTests(unittest.TestCase):
         )
 
         self.assertIn("content ok", result.stdout)
+        self.assertIn("Cue audio coverage", result.stdout)
+
+    def test_log_cue_coverage_reports_full_catalog_and_writes_runtime_log(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            project_root = Path(directory)
+            report = pygame_main._log_cue_coverage(project_root, PROJECT_ROOT / "content")
+            self.assertIn("Cue audio coverage", report)
+            self.assertIn("all preferred cue sounds present", report)
+            log_text = (project_root / "runtime_debug.log").read_text(encoding="utf-8")
+            self.assertIn("cue coverage:", log_text)
+
+    def test_pygame_main_smoke_special_event_runs_headless(self) -> None:
+        result = subprocess.run(
+            ["python", "-m", "horse_racing_game.app.pygame_main", "--smoke-special-event"],
+            cwd=PROJECT_ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        self.assertIn("special event", result.stdout)
+        self.assertIn("Challenge", result.stdout)
 
     def test_pygame_main_smoke_race_replay_speech_and_save_run_headless(self) -> None:
         commands = (

@@ -22,6 +22,7 @@ from horse_racing_game.ui.pygame_career_result import PygameCareerResultScreen
 from horse_racing_game.ui.pygame_online_lobby import OnlineLobbyResult, PygameOnlineLobbyScreen
 from horse_racing_game.ui.pygame_profile import PygameProfileScreen
 from horse_racing_game.ui.pygame_replay import PygameReplayScreen
+from horse_racing_game.ui.pygame_special_events import PygameSpecialEventScreen
 from horse_racing_game.ui.pygame_stats import PygameStatsScreen
 from horse_racing_game.ui.pygame_track_editor import FIELD_NAMES, PygameTrackEditorScreen
 
@@ -223,11 +224,47 @@ class PygameSecondaryScreenTests(unittest.TestCase):
             ("Career attempt incomplete.", "No career rewards were paid.", "Rewards balance: 14."),
         )
 
+    def test_read_only_screens_repeat_on_r_and_exit_otherwise(self) -> None:
+        stats = PygameStatsScreen(self.root / "content", self.root, GameProgress())
+        self.assertTrue(stats._handle_key(pygame.K_r))
+        self.assertFalse(stats._handle_key(pygame.K_ESCAPE))
+        self.assertFalse(stats._handle_key(pygame.K_RETURN))
+
+        result = PygameCareerResultScreen(self.root / "content", self.root, GameProgress())
+        self.assertTrue(result._handle_key(pygame.K_r))
+        self.assertFalse(result._handle_key(pygame.K_SPACE))
+
     def test_stats_next_race_complete_after_calendar(self) -> None:
         progress = GameProgress(career_races_completed=99)
         screen = PygameStatsScreen(self.root / "content", self.root, progress)
 
         self.assertEqual(screen._next_race_line(), "Next championship race: complete")
+
+    def test_interactive_screens_repeat_on_r_without_leaving(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            project_root = Path(directory)
+            profile = PygameProfileScreen(self.root / "content", project_root)
+            self.assertTrue(profile._handle_key(pygame.K_r))
+            self.assertFalse(profile._handle_key(pygame.K_ESCAPE))
+
+            lobby = PygameOnlineLobbyScreen(self.root / "content", project_root)
+            self.assertIsNone(lobby._handle_keydown(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_r)))
+            self.assertIsNotNone(lobby._handle_keydown(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_ESCAPE)))
+
+        hub = PygameCareerHubScreen(
+            self.root / "content",
+            self.root,
+            GameProgress(),
+            MenuSelection(
+                player_horse_id="ember_stride",
+                track_id="ashford_oval",
+                stable_id="oak_lane",
+                difficulty_id="pro",
+                mode="career",
+            ),
+        )
+        self.assertIsNone(hub._handle_keydown(pygame.K_r))
+        self.assertIsNotNone(hub._handle_keydown(pygame.K_ESCAPE))
 
     def test_profile_screen_claims_reward_equips_items_and_draws(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -430,6 +467,45 @@ class PygameSecondaryScreenTests(unittest.TestCase):
             self.assertIsNone(screen._handle_keydown(pygame.K_RETURN))
 
             self.assertEqual(load_progress(project_root).active_career_contract_id, "rookie_sponsor")
+
+    def test_special_event_screen_navigates_selects_and_shows_completion(self) -> None:
+        from horse_racing_game.app.racing_modes import ScenarioProgress
+        from horse_racing_game.app.special_events import (
+            SpecialEventResult,
+            record_special_event_result,
+            special_event_by_id,
+        )
+
+        with tempfile.TemporaryDirectory() as directory:
+            project_root = Path(directory)
+            # persist a completed challenge so the screen reflects saved progress
+            challenge = special_event_by_id("ashford_champion_charge")
+            record_special_event_result(
+                project_root,
+                SpecialEventResult(challenge, ScenarioProgress(challenge.event_id, ("finish", "win")), 100.0, 1, True),
+            )
+
+            screen = PygameSpecialEventScreen(self.root / "content", project_root)
+            surface = pygame.Surface((980, 640))
+
+            # navigation and repeat stay on the screen
+            self.assertTrue(screen._handle_key(pygame.K_DOWN))
+            self.assertTrue(screen._handle_key(pygame.K_r))
+            # the persisted completion is surfaced in the status text
+            done = next(i for i, c in enumerate(screen._challenges) if c.event_id == "ashford_champion_charge")
+            screen._selected_row = done
+            self.assertIn("Complete", screen._status_text(challenge))
+            screen._draw(surface, *self.fonts)
+            self.assertNotEqual(surface.get_at((60, 44))[:3], (0, 0, 0))
+
+            # Enter chooses the current challenge and closes the screen
+            self.assertFalse(screen._handle_key(pygame.K_RETURN))
+            self.assertEqual(screen.chosen_event_id, "ashford_champion_charge")
+
+    def test_special_event_screen_escape_returns_none(self) -> None:
+        screen = PygameSpecialEventScreen(self.root / "content", Path(tempfile.gettempdir()))
+        self.assertFalse(screen._handle_key(pygame.K_ESCAPE))
+        self.assertIsNone(screen.chosen_event_id)
 
     def test_track_editor_key_flow_preview_save_and_draw(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

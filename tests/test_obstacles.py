@@ -30,6 +30,18 @@ class ObstacleTests(unittest.TestCase):
 
         self.assertEqual([obstacle.required_action for obstacle in obstacles], ["dodge", "jump", "duck"])
 
+    def test_highcliff_rise_has_all_three_actions_and_valid_ordering(self) -> None:
+        root = Path(__file__).parent.parent
+
+        obstacles = load_track_obstacles(root / "content" / "obstacles.json", "highcliff_rise")
+
+        self.assertGreaterEqual(len(obstacles), 6)
+        self.assertEqual({o.required_action for o in obstacles}, {"dodge", "jump", "duck"})
+        distances = [o.distance_m for o in obstacles]
+        self.assertEqual(distances, sorted(distances))
+        self.assertTrue(all(0.0 <= o.distance_m <= 1480.0 for o in obstacles))
+        self.assertTrue(all(0 <= o.lane <= 7 for o in obstacles))
+
     def test_warning_then_hit_applies_penalty(self) -> None:
         controller = ObstacleController(
             (

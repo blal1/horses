@@ -89,5 +89,57 @@ class DataDrivenCareerLengthTests(unittest.TestCase):
             self.assertEqual(updated.career_races_completed, 6)
 
 
+class TierRewardScalingTests(unittest.TestCase):
+    def test_reward_multipliers_escalate_with_tier(self) -> None:
+        self.assertLess(difficulty_by_id("rookie").reward_multiplier, 1.0)
+        self.assertEqual(difficulty_by_id("pro").reward_multiplier, 1.0)
+        self.assertGreater(difficulty_by_id("elite").reward_multiplier, 1.0)
+
+    def test_elite_career_win_pays_more_than_rookie(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            rookie = record_race_result(
+                root, GameProgress(), "ember_stride", "ashford_oval",
+                is_tutorial=False, finished=True, is_career=True, rank=1,
+                career_difficulty_id="rookie", career_length=6,
+            )
+            elite = record_race_result(
+                root, GameProgress(), "ember_stride", "ashford_oval",
+                is_tutorial=False, finished=True, is_career=True, rank=1,
+                career_difficulty_id="elite", career_length=6,
+            )
+            rookie_reward = rookie.last_career_result_summary["base_reward"]
+            elite_reward = elite.last_career_result_summary["base_reward"]
+            self.assertGreater(elite_reward, rookie_reward)
+            self.assertEqual(elite.last_career_result_summary["difficulty_tier"], "Elite")
+            self.assertEqual(elite.last_career_result_summary["reward_multiplier"], 1.25)
+
+    def test_result_feedback_reports_difficulty_bonus(self) -> None:
+        from horse_racing_game.app.career_result_feedback import career_result_summary_lines
+
+        scaled = {
+            "finished": True, "rank": 1, "base_reward": 13, "contract_reward": 0,
+            "staff_upkeep": 0, "fatigue_before": 0, "fatigue_after": 10, "injury_days": 0,
+            "net_reward": 13, "rewards_balance": 13, "difficulty_tier": "Elite", "reward_multiplier": 1.25,
+        }
+        lines = career_result_summary_lines(scaled)
+        self.assertTrue(any("Elite tier scaled base reward by 1.25x" in line for line in lines))
+
+        unscaled = {**scaled, "difficulty_tier": None, "reward_multiplier": 1.0}
+        self.assertFalse(any("scaled base reward" in line for line in career_result_summary_lines(unscaled)))
+
+    def test_missing_career_difficulty_leaves_reward_unscaled(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            updated = record_race_result(
+                root, GameProgress(), "ember_stride", "ashford_oval",
+                is_tutorial=False, finished=True, is_career=True, rank=1, career_length=6,
+            )
+            summary = updated.last_career_result_summary
+            self.assertEqual(summary["base_reward"], 10)  # career_reward_for_rank(1), unscaled
+            self.assertIsNone(summary["difficulty_tier"])
+            self.assertEqual(summary["reward_multiplier"], 1.0)
+
+
 if __name__ == "__main__":
     unittest.main()

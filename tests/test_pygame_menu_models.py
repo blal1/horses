@@ -38,7 +38,7 @@ class PygameMenuStateTests(unittest.TestCase):
         state = PygameMenuState(horses, tracks)
 
         state.move_row(-1)
-        self.assertEqual(state.selected_row, 18)
+        self.assertEqual(state.selected_row, 19)
         state.move_row(1)
         self.assertEqual(state.selected_row, 0)
 
@@ -97,6 +97,21 @@ class PygameMenuStateTests(unittest.TestCase):
             result = menu._handle_keydown(pygame.K_RETURN)
             self.assertIsNotNone(result.selection)
             self.assertEqual(result.selection.mode, "race")
+        finally:
+            pygame.quit()
+
+    def test_r_repeats_selection_without_leaving_menu(self) -> None:
+        from horse_racing_game.ui.pygame_menu import _MenuAction
+
+        root = Path(__file__).parent.parent
+        pygame.init()
+        try:
+            menu = PygameMainMenu(root / "content", root)
+            menu._handle_keydown(pygame.K_DOWN)
+            row_before = menu._state.selected_row
+            result = menu._handle_keydown(pygame.K_r)
+            self.assertIs(result, _MenuAction.CONTINUE)
+            self.assertEqual(menu._state.selected_row, row_before)
         finally:
             pygame.quit()
 
@@ -178,6 +193,9 @@ class PygameMenuStateTests(unittest.TestCase):
             self.assertEqual(menu._selection_text(), "Statistics. Press enter to view season stats and standings.")
 
             menu._state.selected_row = 18
+            self.assertEqual(menu._selection_text(), "Special events. Press enter to open scenario challenges.")
+
+            menu._state.selected_row = 19
             self.assertEqual(menu._selection_text(), "Quit. Press enter to exit.")
         finally:
             pygame.quit()
@@ -249,6 +267,20 @@ class PygameMenuStateTests(unittest.TestCase):
 
             self.assertIsNotNone(result.selection)
             self.assertEqual(result.selection.mode, "track_editor")
+        finally:
+            pygame.quit()
+
+    def test_special_events_row_starts_special_event_mode(self) -> None:
+        root = Path(__file__).parent.parent
+        pygame.init()
+        try:
+            menu = PygameMainMenu(root / "content", root)
+            menu._state.selected_row = 18
+
+            result = menu._handle_keydown(pygame.K_RETURN)
+
+            self.assertIsNotNone(result.selection)
+            self.assertEqual(result.selection.mode, "special_event")
         finally:
             pygame.quit()
 

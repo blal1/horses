@@ -2,43 +2,67 @@
   {
     "horse_id": "copper_gate",
     "display_name": "Copper Gate",
+    "racing_style": "Front-runner who steals the rail early",
+    "rivalry_hook": "Beat you to every first turn last season and never lets you forget it.",
     "intro_line": "Copper Gate likes the front. Expect early pressure.",
     "approach_line": "Copper Gate is pressing on your shoulder.",
-    "passing_line": "Copper Gate surges past with a hard stride."
+    "passing_line": "Copper Gate surges past with a hard stride.",
+    "falling_behind_line": "Copper Gate is spent early and dropping back.",
+    "blocking_line": "Copper Gate cuts inside and shuts your rail."
   },
   {
     "horse_id": "river_chime",
     "display_name": "River Chime",
+    "racing_style": "Patient closer who strikes at the wire",
+    "rivalry_hook": "Sat behind you all year, then took the title by a nose.",
     "intro_line": "River Chime waits for the late move.",
     "approach_line": "River Chime is closing quietly.",
-    "passing_line": "River Chime slips by with a late surge."
+    "passing_line": "River Chime slips by with a late surge.",
+    "falling_behind_line": "River Chime eases off, saving it for later.",
+    "blocking_line": "River Chime drifts across and boxes you in."
   },
   {
     "horse_id": "storm_marrow",
     "display_name": "Storm Marrow",
+    "racing_style": "Mudder who thrives when the weather turns",
+    "rivalry_hook": "Owns every rain-soaked track you both have ever run.",
     "intro_line": "Storm Marrow gets braver in bad weather.",
     "approach_line": "Storm Marrow is grinding closer.",
-    "passing_line": "Storm Marrow muscles ahead."
+    "passing_line": "Storm Marrow muscles ahead.",
+    "falling_behind_line": "Storm Marrow loses grip and slides back.",
+    "blocking_line": "Storm Marrow leans in and pins you to the rail."
   },
   {
     "horse_id": "golden_switch",
     "display_name": "Golden Switch",
+    "racing_style": "Explosive sprinter with a short fuse",
+    "rivalry_hook": "One devastating burst is all it needs to break your race.",
     "intro_line": "Golden Switch is dangerous in short bursts.",
     "approach_line": "Golden Switch is winding up a sprint.",
-    "passing_line": "Golden Switch flashes past."
+    "passing_line": "Golden Switch flashes past.",
+    "falling_behind_line": "Golden Switch burns out and fades hard.",
+    "blocking_line": "Golden Switch swerves over to break your run."
   },
   {
     "horse_id": "brass_comet",
     "display_name": "Brass Comet",
+    "racing_style": "Reckless pacesetter who burns hot and fades",
+    "rivalry_hook": "Dares you to chase a pace neither of you can hold.",
     "intro_line": "Brass Comet burns hot early and fades.",
     "approach_line": "Brass Comet is charging on your outside.",
-    "passing_line": "Brass Comet blazes past in a sprint."
+    "passing_line": "Brass Comet blazes past in a sprint.",
+    "falling_behind_line": "Brass Comet has nothing left and drops away.",
+    "blocking_line": "Brass Comet veers in and steals your line."
   },
   {
     "horse_id": "willow_drift",
     "display_name": "Willow Drift",
+    "racing_style": "Ice-cold finisher who hoards every stride",
+    "rivalry_hook": "Never panics, and always seems to have one more gear than you.",
     "intro_line": "Willow Drift saves everything for the line.",
     "approach_line": "Willow Drift is drifting up on you.",
-    "passing_line": "Willow Drift sweeps by with a late kick."
+    "passing_line": "Willow Drift sweeps by with a late kick.",
+    "falling_behind_line": "Willow Drift sits back, biding time as ever.",
+    "blocking_line": "Willow Drift eases across and closes the gap ahead."
   }
 ]
